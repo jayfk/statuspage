@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['statuspage.py'],
-             pathex=['/Users/j/dev/open-source/statuspage'],
+             pathex=['.'],
              binaries=None,
              datas=None,
              hiddenimports=[],
@@ -16,11 +16,29 @@ a = Analysis(['statuspage.py'],
              cipher=block_cipher)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+
 exe = EXE(pyz,
           a.scripts,
           a.binaries,
           a.zipfiles,
           a.datas,
+          [
+            (
+                'template/template.html',
+                'template/template.html',
+                'template'
+            ),
+            (
+                'template/style.css',
+                'template/style.css',
+                'template'
+            ),
+            (
+                'template/milligram.min.css',
+                'template/milligram.min.css',
+                'template'
+            )
+          ],
           name='statuspage',
           debug=False,
           strip=False,
