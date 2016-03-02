@@ -2,5 +2,4 @@ mock/
 htmlcov
 .coverage
 build
-dist
 __pycache__/
