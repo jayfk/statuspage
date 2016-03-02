@@ -1,0 +1,4 @@
+-e git+https://github.com/enix223/PyGithub#egg=Pygithub
+click
+jinja2
+tqdm

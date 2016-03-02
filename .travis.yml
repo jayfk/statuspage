@@ -1,0 +1,14 @@
+after_success:
+  - codecov
+
+before_install:
+  - pip install codecov
+
+install:
+  - pip install -r requirements/base.txt
+  - pip install -r requirements/dev.txt
+
+language: python
+python:
+  - "3.5"
+script: coverage run --source=statuspage tests.py
