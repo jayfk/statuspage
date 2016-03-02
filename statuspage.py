@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+
+import sys, os
+from datetime import datetime, timedelta
+
 from github import Github
 import click
 from jinja2 import Template
 from tqdm import tqdm
-from datetime import datetime, timedelta
 
 __version__ = "0.1"
+
+try:
+    ROOT = sys._MEIPASS
+except AttributeError:
+    ROOT = os.path.dirname(os.path.realpath(__file__))
 
 COLORED_LABELS = (
     ("1192FC", "investigating",),
@@ -19,85 +27,34 @@ STATUSES = [status for _, status in COLORED_LABELS]
 SYSTEM_LABEL_COLOR = "171717"
 
 TEMPLATES = [
-    #"favicon.png",
     "template.html",
-    #"logo.png",
     "milligram.min.css",
-    #"README.md",
     "style.css"
 ]
+
 
 @click.group()
 @click.version_option(__version__, '-v', '--version')
 def cli():  # pragma: no cover
     pass
 
+
 @cli.command()
 @click.option('--name', prompt='Name', help='')
 @click.option('--token', prompt='GitHub API Token', help='')
 @click.option('--systems', prompt='Systems, eg (Website,API)', help='')
 def create(token, name, systems):
-    gh = Github(token)
-    user = gh.get_user()
-    delete = user.get_repo(name)
-    delete.delete()
-
-    # create the repo
-    repo = user.create_repo(name=name)
-
-    # get all labels an delete them
-    for label in tqdm(list(repo.get_labels()), "Deleting initial labels"):
-        label.delete()
-
-    # create new status labels
-    for color, label in tqdm(COLORED_LABELS, desc="Creating status labels"):
-        repo.create_label(name=label, color=color)
-
-    # create system labels
-    for label in tqdm(systems.split(","), desc="Creating system labels"):
-        repo.create_label(name=label.strip(), color=SYSTEM_LABEL_COLOR)
-
-    # add an empty file to master, otherwise we won't be able to create the gh-pages
-    # branch
-    repo.create_file(
-        path="/index.html",
-        message="noting here, move on",
-        content="",
-    )
-
-    # create the gh-pages branch
-    ref = repo.get_git_ref("heads/master")
-    repo.create_git_ref(ref="refs/heads/gh-pages", sha=ref.object.sha)
-
-    # add all the template files to the gh-pages branch
-    for template in tqdm(TEMPLATES, desc="Adding template files"):
-        with open("template/" + template, "r") as f:
-            repo.create_file(
-                path="/" + template,
-                message="initial",
-                content=f.read(),
-                branch="gh-pages"
-            )
-
-    # set the gh-pages branch to be the default branch
-    repo.edit(name=name, default_branch="gh-pages")
-    # run an initial update to add content to the index
-    update(token=token, name=name)
-
-    click.echo("Create new issues at https://github.com/{login}/{name}/issues".format(
-        login=user.login,
-        name=name
-    ))
-    click.echo("Visit your new status page at https://{login}.github.io/{name}/".format(
-        login=user.login,
-        name=name
-    ))
+    run_create(name=name, token=token, systems=systems)
 
 
 @cli.command()
 @click.option('--name', prompt='Name', help='')
 @click.option('--token', prompt='GitHub API Token', help='')
 def update(name, token):
+    run_update(name=name, token=token)
+
+
+def run_update(name, token):
     gh = Github(token)
     repo = gh.get_user().get_repo(name=name)
     systems, incidents = {}, []
@@ -161,7 +118,6 @@ def update(name, token):
     content = template.render({
         "systems": systems, "incidents": incidents, "panels": panels
     })
-
     # get the index.html file, we need the sha to update it
     index = repo.get_file_contents(
         path="/index.html",
@@ -175,6 +131,63 @@ def update(name, token):
         content=content,
         branch="gh-pages"
     )
+
+
+def run_create(name, token, systems):
+    gh = Github(token)
+    user = gh.get_user()
+
+    # create the repo
+    repo = user.create_repo(name=name)
+
+    # get all labels an delete them
+    for label in tqdm(list(repo.get_labels()), "Deleting initial labels"):
+        label.delete()
+
+    # create new status labels
+    for color, label in tqdm(COLORED_LABELS, desc="Creating status labels"):
+        repo.create_label(name=label, color=color)
+
+    # create system labels
+    for label in tqdm(systems.split(","), desc="Creating system labels"):
+        repo.create_label(name=label.strip(), color=SYSTEM_LABEL_COLOR)
+
+    # add an empty file to master, otherwise we won't be able to create the gh-pages
+    # branch
+    repo.create_file(
+        path="/index.html",
+        message="noting here, move on",
+        content="",
+    )
+
+    # create the gh-pages branch
+    ref = repo.get_git_ref("heads/master")
+    repo.create_git_ref(ref="refs/heads/gh-pages", sha=ref.object.sha)
+
+    # add all the template files to the gh-pages branch
+    for template in tqdm(TEMPLATES, desc="Adding template files"):
+        with open(os.path.join(ROOT, "template", template), "r") as f:
+            repo.create_file(
+                path="/" + template,
+                message="initial",
+                content=f.read(),
+                branch="gh-pages"
+            )
+
+    # set the gh-pages branch to be the default branch
+    repo.edit(name=name, default_branch="gh-pages")
+
+    # run an initial update to add content to the index
+    run_update(token=token, name=name)
+
+    click.echo("Create new issues at https://github.com/{login}/{name}/issues".format(
+        login=user.login,
+        name=name
+    ))
+    click.echo("Visit your new status page at https://{login}.github.io/{name}/".format(
+        login=user.login,
+        name=name
+    ))
 
 
 def iter_systems(labels):
