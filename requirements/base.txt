@@ -1,4 +1,4 @@
 -e git+https://github.com/enix223/PyGithub#egg=Pygithub
-click
+click==6.3
 jinja2
 tqdm
