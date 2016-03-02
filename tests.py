@@ -9,8 +9,9 @@ from statuspage import cli, update, create, iter_systems, get_severity, SYSTEM_L
 
 class CLITestCase(TestCase):
 
+    @patch("statuspage.run_update")
     @patch("statuspage.Github")
-    def test_create(self, GithubMock):
+    def test_create(self, GithubMock, run_update):
 
         gh = Mock()
         GithubMock.return_value = gh
@@ -23,7 +24,8 @@ class CLITestCase(TestCase):
                 create,
                 ["--name", "testrepo", "--token", "token", "--systems", "sys1,sys2"]
         )
-
+        print(result)
+        print(result.output)
         self.assertEqual(result.exit_code, 0)
 
         GithubMock.assert_called_once_with("token")
@@ -51,10 +53,12 @@ class CLITestCase(TestCase):
         comment = Mock()
         issue.get_comments.return_value = [comment, ]
         gh.get_user().get_repo().get_issues.return_value = [issue, ]
+        template = Mock()
+        template.decoded_content = b"some foo"
+        gh.get_user().get_repo().get_file_contents.return_value = template
 
         runner = CliRunner()
         result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
-
         self.assertEqual(result.exit_code, 0)
 
         GithubMock.assert_called_with("token")
