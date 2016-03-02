@@ -1,3 +1,6 @@
+[![Updates](https://pyup.io/repos/github/pyupio/statuspage/shield.svg)](https://pyup.io/repos/github/pyupio/statuspage/)
+[![Build Status](https://travis-ci.org/pyupio/statuspage.svg?branch=master)](https://travis-ci.org/pyupio/statuspage)
+[![codecov.io](https://codecov.io/github/pyupio/statuspage/coverage.svg?branch=master)](https://codecov.io/github/pyupio/statuspage?branch=master)
 # Statuspage
 
 A statuspage generator and updater that lets you host your statuspage for free by Github. Uses 
