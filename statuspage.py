@@ -102,7 +102,10 @@ def run_update(name, token):
     # initialize and fill the panels with affected systems
     for system, data in systems.items():
         if data["status"] != "operational":
-            panels[data["status"]].append(system)
+            if data["status"] in panels:
+                panels[data["status"]].append(system)
+            else:
+                panels[data["status"]] = [system,]
 
     # get the SHA of the current HEAD
     sha = repo.get_git_ref("heads/gh-pages").object.sha
@@ -167,8 +170,11 @@ def run_create(name, token, systems):
     # branch
     repo.create_file(
         path="/README.md",
-        message="nothing here, move on",
-        content="",
+        message="initial",
+        content="Visit this site at https://{login}.github.io/{name}/".format(
+            login=user.login,
+            name=name
+        ),
     )
 
     # create the gh-pages branch
