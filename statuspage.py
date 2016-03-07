@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import sys, os
 from datetime import datetime, timedelta
 
-from github import Github
+from github import Github, UnknownObjectException
 import click
 from jinja2 import Template
 from tqdm import tqdm
@@ -55,9 +55,10 @@ def update(name, token):
 
 
 def run_update(name, token):
+    click.echo("Generating..")
     gh = Github(token)
     repo = gh.get_user().get_repo(name=name)
-    systems, incidents = {}, []
+    systems, incidents, panels = {}, [], {}
 
     # get all systems and mark them as operational
     for name in iter_systems(labels=repo.get_labels()):
@@ -99,7 +100,6 @@ def run_update(name, token):
     incidents = sorted(incidents, key=lambda i: i["created"], reverse=True)
 
     # initialize and fill the panels with affected systems
-    panels = dict([(status, []) for status in STATUSES])
     for system, data in systems.items():
         if data["status"] != "operational":
             panels[data["status"]].append(system)
@@ -118,19 +118,30 @@ def run_update(name, token):
     content = template.render({
         "systems": systems, "incidents": incidents, "panels": panels
     })
-    # get the index.html file, we need the sha to update it
-    index = repo.get_file_contents(
-        path="/index.html",
-        ref=sha,
-    )
 
-    repo.update_file(
-        path="/index.html",
-        sha=index.sha,
-        message="update index",
-        content=content,
-        branch="gh-pages"
-    )
+    # create/update the index.html with the template
+    try:
+        # get the index.html file, we need the sha to update it
+        index = repo.get_file_contents(
+            path="/index.html",
+            ref=sha,
+        )
+
+        repo.update_file(
+            path="/index.html",
+            sha=index.sha,
+            message="update index",
+            content=content,
+            branch="gh-pages"
+        )
+    except UnknownObjectException:
+        # index.html does not exist, create it
+        repo.create_file(
+            path="/index.html",
+            message="initial",
+            content=content,
+            branch="gh-pages",
+        )
 
 
 def run_create(name, token, systems):
@@ -155,8 +166,8 @@ def run_create(name, token, systems):
     # add an empty file to master, otherwise we won't be able to create the gh-pages
     # branch
     repo.create_file(
-        path="/index.html",
-        message="noting here, move on",
+        path="/README.md",
+        message="nothing here, move on",
         content="",
     )
 
@@ -188,6 +199,14 @@ def run_create(name, token, systems):
         login=user.login,
         name=name
     ))
+
+    click.echo("")
+    click.echo("###############################################################################")
+    click.echo("# IMPORTANT: Whenever you add or close an issue you have to run the update    #")
+    click.echo("# command to show the changes reflected on your status page.                  #")
+    click.echo("# Here's a one-off command for this repo to safe it somewhere safe:           #")
+    click.echo("# statuspage update --name={name} --token={token}".format(name=name, token=token))
+    click.echo("###############################################################################")
 
 
 def iter_systems(labels):
