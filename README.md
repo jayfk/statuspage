@@ -96,8 +96,8 @@ CSS is located at `style.css` in the root directory. Just edit it and commit the
 If you want to use your own domain to host your status page, you'll need to create a CNAME file
 in your repository and set up a CNAME record pointing to that page with your DNS provider.
 
-If you have e.g. the domain `mydomain.com` and your GitHub username is `myusername` and you want 
-your status page to be reachable under `status.mydomain.com`
+If you have e.g. the domain `mydomain.com`, your GitHub username is `myusername` and you want 
+your status page to be reachable at `status.mydomain.com`
 
 
 - Create a `CNAME` file in the root of your repository
