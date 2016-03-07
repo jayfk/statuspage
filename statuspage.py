@@ -105,7 +105,7 @@ def run_update(name, token):
             if data["status"] in panels:
                 panels[data["status"]].append(system)
             else:
-                panels[data["status"]] = [system,]
+                panels[data["status"]] = [system, ]
 
     # get the SHA of the current HEAD
     sha = repo.get_git_ref("heads/gh-pages").object.sha
