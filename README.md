@@ -109,3 +109,6 @@ your status page to be reachable at `status.mydomain.com`
   
           Name     Type      Value 
           status   CNAME     myusername.github.io
+
+See (Using a custom domain with GitHub Pages)[https://help.github.com/articles/using-a-custom-domain-with-github-pages/] 
+for more info.
