@@ -27,7 +27,7 @@ again once you leave the page.
     chmod +x /usr/local/bin/statuspage
     
 ### On Linux
-    curl -L https://github.com/pyupio/statuspage/raw/master/dist/statuspage_statuspage > /usr/local/bin/statuspage
+    curl -L https://github.com/pyupio/statuspage/raw/master/dist/statuspage_linux > /usr/local/bin/statuspage
     chmod +x /usr/local/bin/statuspage
 
 ## Create a status page
