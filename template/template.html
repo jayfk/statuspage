@@ -30,7 +30,7 @@
 			</nav>
 
 			<section class="container" id="main">
-				{% if panels.items()|length == 0 %}
+				{% if not panels %}
 					<div class="panel operational">
 						All Systems operational.
 					</div>
