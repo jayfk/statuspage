@@ -61,8 +61,8 @@ Now, fill in the title, leave a comment and click on `Submit new issue`.
 
 Go back to your commandline and type:
 
-   statuspage update --token=<yourtoken>
-   Name: mystatuspage
+    statuspage update --token=<yourtoken>
+    Name: mystatuspage
 
 This will update your status page and show a *major outage* on your *Website*.
 
