@@ -16,38 +16,47 @@ class CLITestCase(TestCase):
         self.gh = self.patcher.start()
 
         # setup mocked label
-        label = Mock()
-        label.color = "171717"
-        label.name = "Website"
+        self.label = Mock()
+        self.label.color = "171717"
+        self.label.name = "Website"
 
-        label1 = Mock()
-        label1.color = "171717"
-        label1.name = "API"
+        self.label1 = Mock()
+        self.label1.color = "171717"
+        self.label1.name = "API"
 
-        self.gh().get_user().get_repo().get_labels.return_value = [label, label1]
+        self.gh().get_user().get_repo().get_labels.return_value = [self.label, self.label1]
 
         # set up mocked issue
-        issue = Mock()
-        issue.created_at = datetime.now()
-        issue.state = "open"
-        issue_label = Mock()
-        issue_label.color = "FF4D4D"
-        issue_label.name = "major outage"
-        issue.get_labels.return_value = [issue_label, label]
-        comment = Mock()
-        issue.get_comments.return_value = [comment, ]
+        self.issue = Mock()
+        self.issue.created_at = datetime.now()
+        self.issue.state = "open"
+        self.issue_label = Mock()
+        self.issue_label.color = "FF4D4D"
+        self.issue_label.name = "major outage"
+        self.issue.get_labels.return_value = [self.issue_label, self.label]
+        self.issue.user.login = "some-dude"
+        self.comment = Mock()
+        self.comment.user.login = "some-dude"
+        self.issue.get_comments.return_value = [self.comment, ]
 
-        issue1 = Mock()
-        issue1.created_at = datetime.now()
-        issue1.state = "open"
-        issue1.get_labels.return_value = [issue_label, label1]
-        issue1.get_comments.return_value = [comment, ]
+        self.issue1 = Mock()
+        self.issue1.created_at = datetime.now()
+        self.issue1.state = "open"
+        self.issue1.user.login = "some-dude"
+        self.issue1.get_labels.return_value = [self.issue_label, self.label1]
+        self.issue1.get_comments.return_value = [self.comment, ]
 
-        self.gh().get_user().get_repo().get_issues.return_value = [issue, issue1]
+        self.gh().get_user().get_repo().get_issues.return_value = [self.issue, self.issue1]
         self.template = Mock()
         self.template.decoded_content = b"some foo"
         self.gh().get_user().get_repo().get_file_contents.return_value = self.template
         self.gh().get_organization().get_repo().get_file_contents.return_value = self.template
+
+        self.collaborator = Mock()
+        self.collaborator.login = "some-dude"
+
+        self.gh().get_user().get_repo().get_collaborators.return_value = [self.collaborator,]
+        self.gh().get_organization().get_repo().get_collaborators.return_value = [self.collaborator,]
 
     def tearDown(self):
 
@@ -128,6 +137,28 @@ class CLITestCase(TestCase):
             message='initial',
             path='/index.html'
         )
+
+    def test_update_non_labeled_issue_not_displayed(self):
+        self.issue.get_labels.return_value = []
+
+        runner = CliRunner()
+        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
+        self.assertEqual(result.exit_code, 0)
+
+        # make sure that get_comments is not called for the first issue but for the second
+        self.issue.get_comments.assert_not_called()
+        self.issue1.get_comments.assert_called_once_with()
+
+    def test_update_non_colaborator_issue_not_displayed(self):
+        self.issue.user.login = "some-other-dude"
+
+        runner = CliRunner()
+        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
+        self.assertEqual(result.exit_code, 0)
+
+        # make sure that get_comments is not called for the first issue but for the second
+        self.issue.get_comments.assert_not_called()
+        self.issue1.get_comments.assert_called_once_with()
 
 
 class UtilTestCase(TestCase):
