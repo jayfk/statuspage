@@ -11,32 +11,9 @@ from github import UnknownObjectException
 
 class CLITestCase(TestCase):
 
-    @patch("statuspage.run_update")
-    @patch("statuspage.Github")
-    def test_create(self, GithubMock, run_update):
-
-        gh = Mock()
-        GithubMock.return_value = gh
-
-        label = Mock()
-        gh.get_user().create_repo().get_labels.return_value = [label,]
-
-        runner = CliRunner()
-        result = runner.invoke(
-                create,
-                ["--name", "testrepo", "--token", "token", "--systems", "sys1,sys2"]
-        )
-
-        self.assertEqual(result.exit_code, 0)
-
-        GithubMock.assert_called_once_with("token")
-
-
-    @patch("statuspage.Github")
-    def test_update(self, GithubMock):
-
-        gh = Mock()
-        GithubMock.return_value = gh
+    def setUp(self):
+        self.patcher = patch('statuspage.Github')
+        self.gh = self.patcher.start()
 
         # setup mocked label
         label = Mock()
@@ -47,7 +24,7 @@ class CLITestCase(TestCase):
         label1.color = "171717"
         label1.name = "API"
 
-        gh.get_user().get_repo().get_labels.return_value = [label, label1]
+        self.gh().get_user().get_repo().get_labels.return_value = [label, label1]
 
         # set up mocked issue
         issue = Mock()
@@ -66,55 +43,86 @@ class CLITestCase(TestCase):
         issue1.get_labels.return_value = [issue_label, label1]
         issue1.get_comments.return_value = [comment, ]
 
-        gh.get_user().get_repo().get_issues.return_value = [issue, issue1]
-        template = Mock()
-        template.decoded_content = b"some foo"
-        gh.get_user().get_repo().get_file_contents.return_value = template
+        self.gh().get_user().get_repo().get_issues.return_value = [issue, issue1]
+        self.template = Mock()
+        self.template.decoded_content = b"some foo"
+        self.gh().get_user().get_repo().get_file_contents.return_value = self.template
+        self.gh().get_organization().get_repo().get_file_contents.return_value = self.template
 
-        runner = CliRunner()
-        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
-        self.assertEqual(result.exit_code, 0)
-        GithubMock.assert_called_with("token")
+    def tearDown(self):
 
-        gh.get_user().get_repo.assert_called_with(name="testrepo")
-        gh.get_user().get_repo().get_labels.assert_called_once_with()
+        self.patcher.stop()
 
-    @patch("statuspage.Github")
-    def test_update_index_does_not_exist(self, GithubMock):
+    @patch("statuspage.run_update")
+    def test_create(self, run_update):
 
-        gh = Mock()
-        GithubMock.return_value = gh
-
-        # setup mocked label
         label = Mock()
-        label.color = "171717"
-        label.name = "Website"
-        gh.get_user().get_repo().get_labels.return_value = [label, ]
+        self.gh().get_user().create_repo().get_labels.return_value = [label,]
 
-        # set up mocked issue
-        issue = Mock()
-        issue.state = "open"
-        issue_label = Mock()
-        issue_label.color = "FF4D4D"
-        issue_label.name = "major outage"
-        issue.get_labels.return_value = [issue_label, label]
-        comment = Mock()
-        issue.get_comments.return_value = [comment, ]
-        gh.get_user().get_repo().get_issues.return_value = [issue, ]
-        template = Mock()
-        template.decoded_content = b"some foo"
-        gh.get_user().get_repo().get_file_contents.return_value = template
-        gh.get_user().get_repo().update_file.side_effect = UnknownObjectException(status=404, data="foo")
+        runner = CliRunner()
+        result = runner.invoke(
+                create,
+                ["--name", "testrepo", "--token", "token", "--systems", "sys1,sys2"]
+        )
+
+        self.assertEqual(result.exit_code, 0)
+
+        self.gh.assert_called_with("token")
+
+    @patch("statuspage.run_update")
+    def test_create_org(self, run_update):
+
+        runner = CliRunner()
+        result = runner.invoke(
+                create,
+                ["--name", "testrepo",
+                 "--token", "token",
+                 "--systems", "sys1,sys2",
+                 "--org", "some"]
+        )
+
+        self.assertEqual(result.exit_code, 0)
+
+        self.gh.assert_called_with("token")
+        self.gh().get_organization.assert_called_with("some")
+
+    def test_update(self):
+
+        runner = CliRunner()
+        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
+
+        self.assertEqual(result.exit_code, 0)
+
+        self.gh.assert_called_with("token")
+
+        self.gh().get_user().get_repo.assert_called_with(name="testrepo")
+        self.gh().get_user().get_repo().get_labels.assert_called_once_with()
+
+    def test_update_org(self):
+
+        runner = CliRunner()
+        result = runner.invoke(update, ["--name", "testrepo", "--token", "token", "--org", "some"])
+
+        self.assertEqual(result.exit_code, 0)
+
+        self.gh.assert_called_with("token")
+
+        self.gh().get_organization().get_repo.assert_called_with(name="testrepo")
+        self.gh().get_organization().get_repo().get_labels.assert_called_once_with()
+
+    def test_update_index_does_not_exist(self):
+
+        self.gh().get_user().get_repo().update_file.side_effect = UnknownObjectException(status=404, data="foo")
 
         runner = CliRunner()
         result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
         self.assertEqual(result.exit_code, 0)
 
-        GithubMock.assert_called_with("token")
+        self.gh.assert_called_with("token")
 
-        gh.get_user().get_repo.assert_called_with(name="testrepo")
-        gh.get_user().get_repo().get_labels.assert_called_once_with()
-        gh.get_user().get_repo().create_file.assert_called_once_with(
+        self.gh().get_user().get_repo.assert_called_with(name="testrepo")
+        self.gh().get_user().get_repo().get_labels.assert_called_once_with()
+        self.gh().get_user().get_repo().create_file.assert_called_once_with(
             branch='gh-pages',
             content='some foo',
             message='initial',
