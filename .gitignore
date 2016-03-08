@@ -3,3 +3,4 @@ htmlcov
 .coverage
 build
 __pycache__/
+src
