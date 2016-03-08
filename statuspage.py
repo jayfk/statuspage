@@ -64,6 +64,9 @@ def run_update(name, token, org):
     else:
         repo = gh.get_user().get_repo(name=name)
 
+    # get a list of collaborators for this repo
+    collaborators = [col.login for col in repo.get_collaborators()]
+
     systems, incidents, panels = {}, [], {}
 
     # get all systems and mark them as operational
@@ -77,6 +80,14 @@ def run_update(name, token, org):
         labels = issue.get_labels()
         affected_systems = list(iter_systems(labels))
         severity = get_severity(labels)
+
+        # make sure that non-labeled issues are not displayed
+        if not affected_systems or severity is None:
+            continue
+
+        # make sure that the user that created the issue is a collaborator
+        if issue.user.login not in collaborators:
+            continue
 
         if issue.state == "open":
             # shit is hitting the fan RIGHT NOW. Mark all affected systems
@@ -95,10 +106,12 @@ def run_update(name, token, org):
         }
 
         for comment in issue.get_comments():
-            incident["updates"].append({
-                "created": comment.created_at,
-                "body": comment.body
-            })
+            # add comments by collaborators only
+            if comment.user.login in collaborators:
+                incident["updates"].append({
+                    "created": comment.created_at,
+                    "body": comment.body
+                })
 
         incidents.append(incident)
 
