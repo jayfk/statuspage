@@ -42,22 +42,28 @@ def cli():  # pragma: no cover
 @cli.command()
 @click.option('--name', prompt='Name', help='')
 @click.option('--token', prompt='GitHub API Token', help='')
+@click.option('--org', help='GitHub Organization', default=False)
 @click.option('--systems', prompt='Systems, eg (Website,API)', help='')
-def create(token, name, systems):
-    run_create(name=name, token=token, systems=systems)
+def create(token, name, systems, org):
+    run_create(name=name, token=token, systems=systems, org=org)
 
 
 @cli.command()
 @click.option('--name', prompt='Name', help='')
+@click.option('--org', help='GitHub Organization', default=False)
 @click.option('--token', prompt='GitHub API Token', help='')
-def update(name, token):
-    run_update(name=name, token=token)
+def update(name, token, org):
+    run_update(name=name, token=token, org=org)
 
 
-def run_update(name, token):
+def run_update(name, token, org):
     click.echo("Generating..")
     gh = Github(token)
-    repo = gh.get_user().get_repo(name=name)
+    if org:
+        repo = gh.get_organization(org).get_repo(name=name)
+    else:
+        repo = gh.get_user().get_repo(name=name)
+
     systems, incidents, panels = {}, [], {}
 
     # get all systems and mark them as operational
@@ -147,12 +153,16 @@ def run_update(name, token):
         )
 
 
-def run_create(name, token, systems):
+def run_create(name, token, systems, org):
     gh = Github(token)
-    user = gh.get_user()
+
+    if org:
+        entity = gh.get_organization(org)
+    else:
+        entity = gh.get_user()
 
     # create the repo
-    repo = user.create_repo(name=name)
+    repo = entity.create_repo(name=name)
 
     # get all labels an delete them
     for label in tqdm(list(repo.get_labels()), "Deleting initial labels"):
@@ -172,7 +182,7 @@ def run_create(name, token, systems):
         path="/README.md",
         message="initial",
         content="Visit this site at https://{login}.github.io/{name}/".format(
-            login=user.login,
+            login=entity.login,
             name=name
         ),
     )
@@ -195,14 +205,14 @@ def run_create(name, token, systems):
     repo.edit(name=name, default_branch="gh-pages")
 
     # run an initial update to add content to the index
-    run_update(token=token, name=name)
+    run_update(token=token, name=name, org=org)
 
     click.echo("Create new issues at https://github.com/{login}/{name}/issues".format(
-        login=user.login,
+        login=entity.login,
         name=name
     ))
     click.echo("Visit your new status page at https://{login}.github.io/{name}/".format(
-        login=user.login,
+        login=entity.login,
         name=name
     ))
 
@@ -211,7 +221,8 @@ def run_create(name, token, systems):
     click.echo("# IMPORTANT: Whenever you add or close an issue you have to run the update    #")
     click.echo("# command to show the changes reflected on your status page.                  #")
     click.echo("# Here's a one-off command for this repo to safe it somewhere safe:           #")
-    click.echo("# statuspage update --name={name} --token={token}".format(name=name, token=token))
+    click.echo("# statuspage update --name={name} --token={token} {org}".format(
+            name=name, token=token, org="--org=" + entity.login if org else ""))
     click.echo("###############################################################################")
 
 

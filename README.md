@@ -69,6 +69,16 @@ This will update your status page and show a *major outage* on your *Website*.
 If you change the issue (eg. when you add a new label, create a comment or close the issue), you'll
 need to run `statuspage update` again.
 
+## Use Organization Account
+
+In order to create/update a status page for an organization, add the name of the organization to 
+ the `--org` flag, e.g.:
+ 
+     statuspage create --org=my-org --name=..
+     
+     
+Please note: You need to have the proper permissions to create a new repository for the given
+organization.
 
 ## Customizing
 
