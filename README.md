@@ -23,7 +23,7 @@ again once you leave the page.
 ## Installation
 
 ### On Mac OS X
-    curl -L https://github.com/pyupio/statuspage/raw/master/dist/statuspage > /usr/local/bin/statuspage
+    curl -L https://github.com/pyupio/statuspage/raw/master/dist/statuspage_osx > /usr/local/bin/statuspage
     chmod +x /usr/local/bin/statuspage
     
 ### On Linux
