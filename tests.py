@@ -5,7 +5,7 @@ from datetime import datetime
 from unittest import TestCase
 from mock import patch, Mock
 from click.testing import CliRunner
-from statuspage import cli, update, create, iter_systems, get_severity, SYSTEM_LABEL_COLOR
+from statuspage import cli, create, upgrade
 from github import UnknownObjectException
 
 
@@ -62,8 +62,7 @@ class CLITestCase(TestCase):
 
         self.patcher.stop()
 
-    @patch("statuspage.run_update")
-    def test_create(self, run_update):
+    def test_create(self):
 
         label = Mock()
         self.gh().get_user().create_repo().get_labels.return_value = [label,]
@@ -73,13 +72,30 @@ class CLITestCase(TestCase):
                 create,
                 ["--name", "testrepo", "--token", "token", "--systems", "sys1,sys2"]
         )
-
         self.assertEqual(result.exit_code, 0)
 
         self.gh.assert_called_with("token")
 
-    @patch("statuspage.run_update")
-    def test_create_org(self, run_update):
+    def test_create_org_no_collabs(self):
+
+        runner = CliRunner()
+        result = runner.invoke(
+                create,
+                ["--name", "testrepo",
+                 "--token", "token",
+                 "--systems", "sys1,sys2",
+                 "--org", "some"]
+        )
+
+        self.assertEqual(result.exit_code, -1)
+
+        self.gh.assert_called_with("token")
+        self.gh().get_organization.assert_called_with("some")
+
+    def test_create_org(self):
+        member = Mock()
+        member.login = "some-user"
+        self.gh().get_organization("some").get_members.return_value = [member,]
 
         runner = CliRunner()
         result = runner.invoke(
@@ -95,107 +111,17 @@ class CLITestCase(TestCase):
         self.gh.assert_called_with("token")
         self.gh().get_organization.assert_called_with("some")
 
-    def test_update(self):
+    def test_run_upgrade(self):
 
         runner = CliRunner()
-        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
+        result = runner.invoke(
+                upgrade,
+                ["--name", "testrepo",
+                 "--token", "token"]
+        )
 
         self.assertEqual(result.exit_code, 0)
-
         self.gh.assert_called_with("token")
-
-        self.gh().get_user().get_repo.assert_called_with(name="testrepo")
-        self.gh().get_user().get_repo().get_labels.assert_called_once_with()
-
-    def test_update_org(self):
-
-        runner = CliRunner()
-        result = runner.invoke(update, ["--name", "testrepo", "--token", "token", "--org", "some"])
-
-        self.assertEqual(result.exit_code, 0)
-
-        self.gh.assert_called_with("token")
-
-        self.gh().get_organization().get_repo.assert_called_with(name="testrepo")
-        self.gh().get_organization().get_repo().get_labels.assert_called_once_with()
-
-    def test_update_index_does_not_exist(self):
-
-        self.gh().get_user().get_repo().update_file.side_effect = UnknownObjectException(status=404, data="foo")
-
-        runner = CliRunner()
-        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
-        self.assertEqual(result.exit_code, 0)
-
-        self.gh.assert_called_with("token")
-
-        self.gh().get_user().get_repo.assert_called_with(name="testrepo")
-        self.gh().get_user().get_repo().get_labels.assert_called_once_with()
-        self.gh().get_user().get_repo().create_file.assert_called_once_with(
-            branch='gh-pages',
-            content='some foo',
-            message='initial',
-            path='/index.html'
-        )
-
-    def test_update_non_labeled_issue_not_displayed(self):
-        self.issue.get_labels.return_value = []
-
-        runner = CliRunner()
-        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
-        self.assertEqual(result.exit_code, 0)
-
-        # make sure that get_comments is not called for the first issue but for the second
-        self.issue.get_comments.assert_not_called()
-        self.issue1.get_comments.assert_called_once_with()
-
-    def test_update_non_colaborator_issue_not_displayed(self):
-        self.issue.user.login = "some-other-dude"
-
-        runner = CliRunner()
-        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
-        self.assertEqual(result.exit_code, 0)
-
-        # make sure that get_comments is not called for the first issue but for the second
-        self.issue.get_comments.assert_not_called()
-        self.issue1.get_comments.assert_called_once_with()
-
-
-class UtilTestCase(TestCase):
-
-    def test_iter_systems(self):
-        label1 = Mock()
-        label2 = Mock()
-        label1.name = "website"
-        label1.color = SYSTEM_LABEL_COLOR
-
-        self.assertEqual(
-            list(iter_systems([label1, label2])),
-            ["website", ]
-        )
-
-        self.assertEqual(
-            list(iter_systems([label2])),
-            []
-        )
-
-    def test_severity(self):
-        label1 = Mock()
-        label2 = Mock()
-        label1.color = "FF4D4D"
-
-        self.assertEqual(
-            get_severity([label1, label2]),
-            "major outage"
-        )
-
-        label1.color = "000000"
-
-        self.assertEqual(
-            get_severity([label1, label2]),
-            None
-        )
-
 
 
 

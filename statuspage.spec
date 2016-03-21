@@ -24,8 +24,8 @@ exe = EXE(pyz,
           a.datas,
           [
             (
-                'template/template.html',
-                'template/template.html',
+                'template/index.html',
+                'template/index.html',
                 'template'
             ),
             (
@@ -36,6 +36,21 @@ exe = EXE(pyz,
             (
                 'template/milligram.min.css',
                 'template/milligram.min.css',
+                'template'
+            ),
+            (
+                'template/script.js',
+                'template/script.js',
+                'template'
+            ),
+            (
+                'template/mustache.min.js',
+                'template/milligram.min.css',
+                'template'
+            ),
+            (
+                'template/lockr.js',
+                'template/lockr.js',
                 'template'
             )
           ],

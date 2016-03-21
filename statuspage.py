@@ -2,14 +2,11 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import sys, os
-from datetime import datetime, timedelta
-
-from github import Github, UnknownObjectException
+from github import Github
 import click
-from jinja2 import Template
 from tqdm import tqdm
 
-__version__ = "0.2"
+__version__ = "0.3pre"
 
 try:
     ROOT = sys._MEIPASS
@@ -22,14 +19,15 @@ COLORED_LABELS = (
     ("FF4D4D", "major outage", )
 )
 
-STATUSES = [status for _, status in COLORED_LABELS]
-
 SYSTEM_LABEL_COLOR = "171717"
 
 TEMPLATES = [
-    "template.html",
     "milligram.min.css",
-    "style.css"
+    "style.css",
+    "script.js",
+    "mustache.min.js",
+    "lockr.js",
+    "index.html",
 ]
 
 
@@ -52,127 +50,63 @@ def create(token, name, systems, org):
 @click.option('--name', prompt='Name', help='')
 @click.option('--org', help='GitHub Organization', default=False)
 @click.option('--token', prompt='GitHub API Token', help='')
-def update(name, token, org):
-    run_update(name=name, token=token, org=org)
+def update(name, token, org):  # pragma: no cover
+    click.echo("This function is no longer available since version 0.3.")
+
+@cli.command()
+@click.option('--name', prompt='Name', help='')
+@click.option('--org', help='GitHub Organization', default=False)
+@click.option('--token', prompt='GitHub API Token', help='')
+def upgrade(name, token, org):
+    run_upgrade(name, token, org)
 
 
-def run_update(name, token, org):
-    click.echo("Generating..")
+def run_upgrade(name, token, org):
+
     gh = Github(token)
-    if org:
-        repo = gh.get_organization(org).get_repo(name=name)
-    else:
-        repo = gh.get_user().get_repo(name=name)
+    entity, collaborators = get_user_info(gh, org)
 
-    # get a list of collaborators for this repo
-    collaborators = [col.login for col in repo.get_collaborators()]
+    repo = entity.get_repo(name=name)
 
-    systems, incidents, panels = {}, [], {}
+    ref_sha = repo.get_git_ref("heads/gh-pages").object.sha
 
-    # get all systems and mark them as operational
-    for name in iter_systems(labels=repo.get_labels()):
-        systems[name] = {
-            "status": "operational",
-        }
+    template = repo.get_file_contents(path="/template.html", ref=ref_sha)
 
-    # loop over all issues in the past 90 days to get current and past incidents
-    for issue in repo.get_issues(state="all", since=datetime.now() - timedelta(days=90)):
-        labels = issue.get_labels()
-        affected_systems = list(iter_systems(labels))
-        severity = get_severity(labels)
-
-        # make sure that non-labeled issues are not displayed
-        if not affected_systems or severity is None:
-            continue
-
-        # make sure that the user that created the issue is a collaborator
-        if issue.user.login not in collaborators:
-            continue
-
-        if issue.state == "open":
-            # shit is hitting the fan RIGHT NOW. Mark all affected systems
-            for affected_system in affected_systems:
-                systems[affected_system]["status"] = severity
-
-        # create an incident
-        incident = {
-            "created": issue.created_at,
-            "title": issue.title,
-            "systems": affected_systems,
-            "severity": severity,
-            "closed": issue.state == "closed",
-            "body": issue.body,
-            "updates": []
-        }
-
-        for comment in issue.get_comments():
-            # add comments by collaborators only
-            if comment.user.login in collaborators:
-                incident["updates"].append({
-                    "created": comment.created_at,
-                    "body": comment.body
-                })
-
-        incidents.append(incident)
-
-    # sort incidents by date
-    incidents = sorted(incidents, key=lambda i: i["created"], reverse=True)
-
-    # initialize and fill the panels with affected systems
-    for system, data in systems.items():
-        if data["status"] != "operational":
-            if data["status"] in panels:
-                panels[data["status"]].append(system)
-            else:
-                panels[data["status"]] = [system, ]
-
-    # get the SHA of the current HEAD
-    sha = repo.get_git_ref("heads/gh-pages").object.sha
-
-    # get the template from the repo
-    template_file = repo.get_file_contents(
+    repo.delete_file(
         path="/template.html",
-        ref=sha
+        message="upgrading to 0.3",
+        sha=template.sha,
+        branch="gh-pages"
     )
 
-    # render the template
-    template = Template(template_file.decoded_content.decode("utf-8"))
-    content = template.render({
-        "systems": systems, "incidents": incidents, "panels": panels
-    })
+    for template in tqdm(["index.html", "style.css"], desc="Editing files"):
+        with open(os.path.join(ROOT, "template", template), "r") as f:
+            content = f.read()
+            if template == "index.html":
+                content = add_config(content, entity.login, name, collaborators)
+            old = repo.get_file_contents("/" + template, ref_sha)
+            repo.update_file(
+                path="/" + template,
+                message="upgrading to 0.3",
+                content=content,
+                branch="gh-pages",
+                sha=old.sha,
+            )
 
-    # create/update the index.html with the template
-    try:
-        # get the index.html file, we need the sha to update it
-        index = repo.get_file_contents(
-            path="/index.html",
-            ref=sha,
-        )
-
-        repo.update_file(
-            path="/index.html",
-            sha=index.sha,
-            message="update index",
-            content=content,
-            branch="gh-pages"
-        )
-    except UnknownObjectException:
-        # index.html does not exist, create it
-        repo.create_file(
-            path="/index.html",
-            message="initial",
-            content=content,
-            branch="gh-pages",
-        )
+    for template in tqdm(["lockr.js", "mustache.min.js", "script.js"], desc="Uploading new files"):
+        with open(os.path.join(ROOT, "template", template), "r") as f:
+            repo.create_file(
+                path="/" + template,
+                message="upgrading to 0.3",
+                content=f.read(),
+                branch="gh-pages"
+            )
 
 
 def run_create(name, token, systems, org):
     gh = Github(token)
 
-    if org:
-        entity = gh.get_organization(org)
-    else:
-        entity = gh.get_user()
+    entity, collaborators = get_user_info(gh, org)
 
     # create the repo
     repo = entity.create_repo(name=name)
@@ -207,18 +141,18 @@ def run_create(name, token, systems, org):
     # add all the template files to the gh-pages branch
     for template in tqdm(TEMPLATES, desc="Adding template files"):
         with open(os.path.join(ROOT, "template", template), "r") as f:
+            content = f.read()
+            if template == "index.html":
+                content = add_config(content, entity.login, name, collaborators)
             repo.create_file(
                 path="/" + template,
                 message="initial",
-                content=f.read(),
+                content=content,
                 branch="gh-pages"
             )
 
     # set the gh-pages branch to be the default branch
     repo.edit(name=name, default_branch="gh-pages")
-
-    # run an initial update to add content to the index
-    run_update(token=token, name=name, org=org)
 
     click.echo("Create new issues at https://github.com/{login}/{name}/issues".format(
         login=entity.login,
@@ -229,28 +163,30 @@ def run_create(name, token, systems, org):
         name=name
     ))
 
-    click.echo("")
-    click.echo("###############################################################################")
-    click.echo("# IMPORTANT: Whenever you add or close an issue you have to run the update    #")
-    click.echo("# command to show the changes reflected on your status page.                  #")
-    click.echo("# Here's a one-off command for this repo to safe it somewhere safe:           #")
-    click.echo("# statuspage update --name={name} --token={token} {org}".format(
-            name=name, token=token, org="--org=" + entity.login if org else ""))
-    click.echo("###############################################################################")
+
+def add_config(content, login, name, collaborators):
+    # add the config for this repo to index.html
+    config = """{{"repo": "{login}/{name}", "collaborators": [{collaborators}], "v": "{v}"}}""".format(
+            login=login,
+            name=name,
+            v=__version__,
+            collaborators=",".join(["'{0}'".format(c) for c in collaborators]),
+    )
+    return content.replace("{{ config }}", config)
 
 
-def iter_systems(labels):
-    for label in labels:
-        if label.color == SYSTEM_LABEL_COLOR:
-            yield label.name
-
-
-def get_severity(labels):
-    label_map = dict(COLORED_LABELS)
-    for label in labels:
-        if label.color in label_map:
-            return label_map[label.color]
-    return None
+def get_user_info(gh, org):
+    if org:
+        entity = gh.get_organization(org)
+        collaborators = [user.login for user in entity.get_members()]
+        if not collaborators:
+            click.echo("Unable to read collaborators for {org}. Please make sure to enable "
+                       "read:org for this access token and try again".format(org=entity.name))
+            sys.exit(-1)
+    else:
+        entity = gh.get_user()
+        collaborators = [entity.login]
+    return entity, collaborators
 
 
 if __name__ == '__main__':  # pragma: no cover

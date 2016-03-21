@@ -4,3 +4,4 @@ htmlcov
 build
 __pycache__/
 src
+dist

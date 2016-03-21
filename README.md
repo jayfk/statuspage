@@ -65,15 +65,6 @@ Add a systems label, eg. `Website` and pick a severity eg. `major outage` and ad
 
 Now, fill in the title, leave a comment and click on `Submit new issue`.
 
-Go back to your commandline and type:
-
-    statuspage update --token=<yourtoken>
-    Name: mystatuspage
-
-This will update your status page and show a *major outage* on your *Website*.
-
-If you change the issue (eg. when you add a new label, create a comment or close the issue), you'll
-need to run `statuspage update` again.
 
 ## Use Organization Account
 
@@ -84,7 +75,7 @@ In order to create/update a status page for an organization, add the name of the
      
      
 Please note: You need to have the proper permissions to create a new repository for the given
-organization.
+organization and your token needs to have `read:org` enabled.
 
 ## Customizing
 
@@ -97,11 +88,11 @@ or, on the website, select the `gh-pages` branch before editing things.
 
 ### Template
 
-The template is fully customizable, edit `template.html`.
+The template is fully customizable, edit `index.html`.
 
 ### Logo
 
-Add a `logo.png` to your repo's root and change `template.html` to point to that file.
+Add a `logo.png` to your repo's root and change `index.html` to point to that file.
 
 ### CSS
 

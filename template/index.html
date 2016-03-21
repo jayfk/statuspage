@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="index, follow">
+  <title>Status</title>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+  <link rel="stylesheet" href="milligram.min.css">
+  <link rel="stylesheet" href="style.css">
+  {# upload your own favicon.png to the root of your repo and replace with href="favicon.png" #}
+  <link rel="icon"
+        href="https://raw.githubusercontent.com/pyupio/statuspage/master/template/favicon.png">
+</head>
+<body>
+
+<main class="wrapper">
+
+  <nav class="navigation">
+    <section class="container">
+      <a class="navigation-title" href="">
+
+        <img class="img"
+             src="https://raw.githubusercontent.com/pyupio/statuspage/master/template/logo.png"
+             height="30">
+        <h1 class="title">Status</h1>
+        <div id="load-indicator" style="float: right;"><div class="spinner"></div></div>
+      </a>
+    </section>
+  </nav>
+  <section class="container" id="main">
+
+  </section>
+
+  <script id="template" type="x-tmpl-mustache">
+
+    {{#panels.0}}
+      {{#panels}}
+      <div class="panel {{ status }}">
+      {{ status }} on {{#systems}}{{.}}{{/systems}}.
+      </div>
+      {{/panels}}
+    {{/panels.0}}
+
+    {{^panels.0}}
+    <div class="panel operational">
+      All Systems operational.
+    </div>
+    {{/panels.0}}
+
+
+    <h4>Systems</h4>
+    <ul class="systems">
+      {{#systems}}
+      <li>
+        {{ name }} <span class="status {{ status }}">{{ status }}</span>
+      </li>
+      {{/systems}}
+    </ul>
+
+    <h4>Incidents</h4>
+    {{#incidents.0}}
+    {{#incidents}}
+    <div class="incident">
+      <span class="date">{{ created_at }}</span>
+
+
+      <span class="label {{ severity }} float-right">{{ severity }}</span>
+
+      {{#affectedSystems}}
+
+      <span class="label system float-right">{{.}}</span>
+      {{/affectedSystems}}
+      <hr/>
+
+      <span class="title">{{ title }}</span>
+      <p>{{ body }}</p>
+    </div>
+    {{/incidents}}
+    {{/incidents.0}}
+
+    {{^incidents.0}}
+    <em>No past incidents.</em>
+    {{/incidents.0}}
+  </script>
+
+  <footer class="footer">
+    <section class="container">
+      <hr/>
+      <p>Status page hosted by GitHub, generated with <a
+              href="https://github.com/pyupio/statuspage">pyupio/statuspage</a></p>
+    </section>
+  </footer>
+
+</main>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="mustache.min.js"></script>
+<script src="lockr.js"></script>
+<script src="script.js"></script>
+<script type="text/javascript">
+
+  var config = {{ config }};
+
+  render();
+  setInterval(render, 10000);
+
+</script>
+
+</body>
+</html>
