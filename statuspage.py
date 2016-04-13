@@ -2,6 +2,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import sys, os
+import hashlib
+import base64
 from datetime import datetime, timedelta
 
 from github import Github, UnknownObjectException
@@ -148,6 +150,14 @@ def run_update(name, token, org):
             path="/index.html",
             ref=sha,
         )
+
+        remote_content = base64.b64decode(index.content)
+        remote_checksum = hashlib.sha1(remote_content.encode())
+        local_checksum = hashlib.sha1(content.encode())
+
+        if remote_checksum.hexdigest() == local_checksum.hexdigest():
+           click.echo("Local status matches remote status, no need to commit.")
+           return False
 
         repo.update_file(
             path="/index.html",
