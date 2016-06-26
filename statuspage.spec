@@ -1,12 +1,22 @@
 # -*- mode: python -*-
 
+
+from PyInstaller.utils.hooks.hookutils import exec_statement
+
+# Collect certificate files.
+cert_datas = exec_statement("""
+    import ssl
+    print(ssl.get_default_verify_paths().cafile)""").strip().split()
+cert_datas = [(f, 'lib'), for f in cert_datas)
+
+
 block_cipher = None
 
 
 a = Analysis(['statuspage.py'],
              pathex=['.'],
              binaries=None,
-             datas=None,
+             datas=cert_datas,
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
