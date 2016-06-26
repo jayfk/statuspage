@@ -11,6 +11,11 @@ from tqdm import tqdm
 
 __version__ = "0.2"
 
+
+# Load certificate file.
+if getattr(sys, 'frozen', False):
+    os.environ['SSL_CERT_FILE'] = os.path.join(sys._MEIPASS, 'lib', 'cert.pem')
+
 try:
     ROOT = sys._MEIPASS
 except AttributeError:
