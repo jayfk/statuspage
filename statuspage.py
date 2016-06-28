@@ -1,10 +1,17 @@
+#! /usr/bin/python -u
 # -*- coding: utf-8 -*-
+
 from __future__ import absolute_import, print_function, unicode_literals
 
 import sys, os
 from datetime import datetime, timedelta
 
-from github import Github, UnknownObjectException
+try:
+    from github import Github, UnknownObjectException
+except:
+    print("Module github not found, please try: sudo pip install -r ./requirements/base.txt")
+    exit(1)
+
 import click
 from jinja2 import Template
 from tqdm import tqdm
