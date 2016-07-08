@@ -55,7 +55,7 @@
 				{% if incidents %}
 					{% for incident in incidents %}
 					<div class="incident">
-						<span class="date">{{ incident.created }}</span>
+						<span class="date">{{ incident.created }} UTC</span>
 
 						{% if incident.closed %}
 							<span class="label operational float-right">resolved</span>
