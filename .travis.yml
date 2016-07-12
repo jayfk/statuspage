@@ -11,4 +11,4 @@ install:
 language: python
 python:
   - "3.5"
-script: coverage run --source=statuspage tests.py
+script: coverage run --source=statuspage statuspage/tests.py
