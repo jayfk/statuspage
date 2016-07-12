@@ -24,12 +24,17 @@ again once you leave the page.
 
 ## Installation
 
-### On Mac OS X
-    curl -L https://github.com/pyupio/statuspage/raw/master/dist/statuspage_osx > /usr/local/bin/statuspage
+### Using pip
+
+    pip install statuspage
+
+### Binaries
+#### macOS (64Bit)
+    curl -L https://github.com/jayfk/statuspage/releases/download/0.3.1/statuspage-darwin-64 > /usr/local/bin/statuspage
     chmod +x /usr/local/bin/statuspage
     
-### On Linux
-    curl -L https://github.com/pyupio/statuspage/raw/master/dist/statuspage_linux > /usr/local/bin/statuspage
+#### Linux (64Bit)
+    curl -L https://github.com/jayfk/statuspage/releases/download/0.3.1/statuspage-linux-64 > /usr/local/bin/statuspage
     chmod +x /usr/local/bin/statuspage
 
 ## Create a status page
