@@ -2,6 +2,9 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.3.3 [2016-07-13]
+- issued new pypi release
+
 ## 0.3.2 [2016-07-13]
 - fixed packaging problems by using a module
 - minified and merged style.css with milligram.min.css
