@@ -28,7 +28,6 @@ SYSTEM_LABEL_COLOR = "171717"
 
 TEMPLATES = [
     "template.html",
-    "milligram.min.css",
     "style.css"
 ]
 
