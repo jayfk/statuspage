@@ -15,7 +15,7 @@ endif
 ifndef GITHUB_RELEASE
     $(error no github-release binary found)
 endif
-	sed -i '' 's/__version__ = "[^0-9.]*\([0-9.]*\).*"/__version__ = "$(version)"/' statuspage.py
+	sed -i '' 's/__version__ = "[^0-9.]*\([0-9.]*\).*"/__version__ = "$(version)"/' statuspage/statuspage.py
 	sed -i '' 's/__version__ = "[^0-9.]*\([0-9.]*\).*"/__version__ = "$(version)"/' setup.py
 	git commit -a -m 'new release $(version)'
 	git tag $(version)
@@ -30,11 +30,11 @@ endif
 osx:
 	pip install -r requirements/base.txt
 	pip install -r requirements/dev.txt
-	pyinstaller statuspage.spec
+	pyinstaller statuspage/statuspage.spec
 	mv dist/statuspage dist/statuspage-darwin-64
 
 linux:
 
-	docker run -e LC_ALL="C.UTF-8" -e LANG="C.UTF-8" -v $(shell pwd):/app -w=/app -it python:3.5 bash -c "pip install -r requirements/base.txt && pip install -r requirements/dev.txt && pyinstaller statuspage.spec"
+	docker run -e LC_ALL="C.UTF-8" -e LANG="C.UTF-8" -v $(shell pwd):/app -w=/app -it python:3.5 bash -c "pip install -r requirements/base.txt && pip install -r requirements/dev.txt && pyinstaller statuspage/statuspage.spec"
 	mv dist/statuspage dist/statuspage-linux-64
 

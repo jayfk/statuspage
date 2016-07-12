@@ -31,19 +31,14 @@ exe = EXE(pyz,
           [
             (
                 'template/template.html',
-                'template/template.html',
+                'statuspage/template/template.html',
                 'template'
             ),
             (
                 'template/style.css',
-                'template/style.css',
+                'statuspage/template/style.css',
                 'template'
             ),
-            (
-                'template/milligram.min.css',
-                'template/milligram.min.css',
-                'template'
-            )
           ],
           name='statuspage',
           debug=False,

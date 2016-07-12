@@ -5,7 +5,7 @@ import io
 import sys
 
 from setuptools import setup
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 with io.open('README.md', 'r', encoding='utf-8') as readme_file:
     readme = readme_file.read()
@@ -32,9 +32,10 @@ setup(
     url='https://github.com/jayfk/statuspage',
     entry_points='''
         [console_scripts]
-        statuspage=statuspage:cli
+        statuspage=statuspage.statuspage:cli
     ''',
-    py_modules=['statuspage'],
+    packages=['statuspage'],
+    package_data={'': ["template/*"]},
     include_package_data=True,
     install_requires=requirements,
     license='MIT',

@@ -2,7 +2,8 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Not released [TBD]
+## 0.3.2 [2016-07-13]
+- fixed packaging problems by using a module
 - minified and merged style.css with milligram.min.css
 
 ## 0.3.1 [2016-07-12]
