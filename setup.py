@@ -5,7 +5,7 @@ import io
 import sys
 
 from setuptools import setup
-__version__ = "0.3"
+__version__ = "0.3.3"
 
 with io.open('README.md', 'r', encoding='utf-8') as readme_file:
     readme = readme_file.read()
