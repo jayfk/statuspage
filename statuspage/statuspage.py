@@ -18,6 +18,8 @@ try:
 except AttributeError:
     ROOT = os.path.dirname(os.path.realpath(__file__))
 
+PY3 = sys.version_info >= (3, 0)
+
 COLORED_LABELS = (
     ("1192FC", "investigating",),
     ("FFA500", "degraded performance"),
@@ -150,11 +152,7 @@ def run_update(name, token, org):
             ref=sha,
         )
 
-        remote_content = base64.b64decode(index.content)
-        remote_checksum = hashlib.sha1(remote_content.encode())
-        local_checksum = hashlib.sha1(content.encode())
-
-        if remote_checksum.hexdigest() == local_checksum.hexdigest():
+        if is_same_content(content, base64.b64decode(index.content)):
            click.echo("Local status matches remote status, no need to commit.")
            return False
 
@@ -174,6 +172,15 @@ def run_update(name, token, org):
             branch="gh-pages",
         )
 
+def is_same_content(c1, c2):
+    def sha1(c):
+        if PY3:
+            if isinstance(c, str):
+                c = bytes(c, "utf-8")
+        else:
+            c = c.encode()
+        return hashlib.sha1(c)
+    return sha1(c1).hexdigest() == sha1(c2).hexdigest()
 
 def run_create(name, token, systems, org):
     gh = Github(token)

@@ -7,7 +7,7 @@ from mock import patch, Mock
 from click.testing import CliRunner
 from statuspage import cli, update, create, iter_systems, get_severity, SYSTEM_LABEL_COLOR
 from github import UnknownObjectException
-
+import codecs
 
 class CLITestCase(TestCase):
 
@@ -49,7 +49,7 @@ class CLITestCase(TestCase):
         self.gh().get_user().get_repo().get_issues.return_value = [self.issue, self.issue1]
         self.template = Mock()
         self.template.decoded_content = b"some foo"
-        self.template.content = b"some other foo".encode("base64")
+        self.template.content = codecs.encode(b"some other foo", "base64")
         self.gh().get_user().get_repo().get_file_contents.return_value = self.template
         self.gh().get_organization().get_repo().get_file_contents.return_value = self.template
 
@@ -108,7 +108,7 @@ class CLITestCase(TestCase):
 
     def test_dont_update_when_nothing_changes(self):
         runner = CliRunner()
-        self.template.content = b"some foo".encode("base64")
+        self.template.content = codecs.encode(b"some foo", "base64")
         result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
         self.assertEqual(result.exit_code, 0)
         self.gh.assert_called_with("token")
