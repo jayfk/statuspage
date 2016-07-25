@@ -49,6 +49,7 @@ class CLITestCase(TestCase):
         self.gh().get_user().get_repo().get_issues.return_value = [self.issue, self.issue1]
         self.template = Mock()
         self.template.decoded_content = b"some foo"
+        self.template.content = b"some other foo".encode("base64")
         self.gh().get_user().get_repo().get_file_contents.return_value = self.template
         self.gh().get_organization().get_repo().get_file_contents.return_value = self.template
 
@@ -99,13 +100,21 @@ class CLITestCase(TestCase):
 
         runner = CliRunner()
         result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
-
         self.assertEqual(result.exit_code, 0)
 
         self.gh.assert_called_with("token")
-
         self.gh().get_user().get_repo.assert_called_with(name="testrepo")
         self.gh().get_user().get_repo().get_labels.assert_called_once_with()
+
+    def test_dont_update_when_nothing_changes(self):
+        runner = CliRunner()
+        self.template.content = b"some foo".encode("base64")
+        result = runner.invoke(update, ["--name", "testrepo", "--token", "token"])
+        self.assertEqual(result.exit_code, 0)
+        self.gh.assert_called_with("token")
+        self.gh().get_user().get_repo.assert_called_with(name="testrepo")
+        self.gh().get_user().get_repo().get_labels.assert_called_once_with()
+        self.gh().get_user().get_repo().update_file.assert_not_called()
 
     def test_update_org(self):
 
