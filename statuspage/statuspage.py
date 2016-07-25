@@ -11,7 +11,7 @@ import click
 from jinja2 import Template
 from tqdm import tqdm
 
-__version__ = "0.3.3"
+__version__ = "0.4.0"
 
 try:
     ROOT = sys._MEIPASS
