@@ -2,6 +2,9 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.4.1 [2016-07-25]
+- Fixed a bug on python 3 where the hash function wasn't working.
+
 ## 0.4.0 [2016-07-25]
 - Only commit if content differs (@Jcpetrucci)
 
