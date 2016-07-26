@@ -12,7 +12,7 @@ from jinja2 import Template
 from tqdm import tqdm
 from collections import OrderedDict
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 try:
     ROOT = sys._MEIPASS

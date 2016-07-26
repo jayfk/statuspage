@@ -30,11 +30,11 @@ again once you leave the page.
 
 ### Binaries
 #### macOS (64Bit)
-    curl -L https://github.com/jayfk/statuspage/releases/download/0.3.1/statuspage-darwin-64 > /usr/local/bin/statuspage
+    curl -L https://github.com/jayfk/statuspage/releases/download/0.5.1/statuspage-darwin-64 > /usr/local/bin/statuspage
     chmod +x /usr/local/bin/statuspage
     
 #### Linux (64Bit)
-    curl -L https://github.com/jayfk/statuspage/releases/download/0.3.1/statuspage-linux-64 > /usr/local/bin/statuspage
+    curl -L https://github.com/jayfk/statuspage/releases/download/0.5.1/statuspage-linux-64 > /usr/local/bin/statuspage
     chmod +x /usr/local/bin/statuspage
 
 ## Create a status page
