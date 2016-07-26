@@ -14,7 +14,7 @@ with io.open('CHANGELOG.md', 'r', encoding='utf-8') as history_file:
     history = history_file.read()
 
 requirements = [
-    'pygithub-redux>=1.29.0',
+    'pygithub-redux>=1.30.0',
     'click',
     'jinja2',
     'tqdm',
