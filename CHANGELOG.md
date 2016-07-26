@@ -2,6 +2,10 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.5.0 [2016-07-26]
+- Systems and Panels are now ordered to make sure that no commit is issued when nothing changes (#12)
+- Refactored the code to make it easier to read
+
 ## 0.4.1 [2016-07-25]
 - Fixed a bug on python 3 where the hash function wasn't working.
 

@@ -10,8 +10,9 @@ from github import Github, UnknownObjectException
 import click
 from jinja2 import Template
 from tqdm import tqdm
+from collections import OrderedDict
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 
 try:
     ROOT = sys._MEIPASS
@@ -61,73 +62,9 @@ def update(name, token, org):
 
 def run_update(name, token, org):
     click.echo("Generating..")
-    gh = Github(token)
-    if org:
-        repo = gh.get_organization(org).get_repo(name=name)
-    else:
-        repo = gh.get_user().get_repo(name=name)
 
-    # get a list of collaborators for this repo
-    collaborators = [col.login for col in repo.get_collaborators()]
-
-    systems, incidents, panels = {}, [], {}
-
-    # get all systems and mark them as operational
-    for name in iter_systems(labels=repo.get_labels()):
-        systems[name] = {
-            "status": "operational",
-        }
-
-    # loop over all issues in the past 90 days to get current and past incidents
-    for issue in repo.get_issues(state="all", since=datetime.now() - timedelta(days=90)):
-        labels = issue.get_labels()
-        affected_systems = list(iter_systems(labels))
-        severity = get_severity(labels)
-
-        # make sure that non-labeled issues are not displayed
-        if not affected_systems or severity is None:
-            continue
-
-        # make sure that the user that created the issue is a collaborator
-        if issue.user.login not in collaborators:
-            continue
-
-        if issue.state == "open":
-            # shit is hitting the fan RIGHT NOW. Mark all affected systems
-            for affected_system in affected_systems:
-                systems[affected_system]["status"] = severity
-
-        # create an incident
-        incident = {
-            "created": issue.created_at,
-            "title": issue.title,
-            "systems": affected_systems,
-            "severity": severity,
-            "closed": issue.state == "closed",
-            "body": issue.body,
-            "updates": []
-        }
-
-        for comment in issue.get_comments():
-            # add comments by collaborators only
-            if comment.user.login in collaborators:
-                incident["updates"].append({
-                    "created": comment.created_at,
-                    "body": comment.body
-                })
-
-        incidents.append(incident)
-
-    # sort incidents by date
-    incidents = sorted(incidents, key=lambda i: i["created"], reverse=True)
-
-    # initialize and fill the panels with affected systems
-    for system, data in systems.items():
-        if data["status"] != "operational":
-            if data["status"] in panels:
-                panels[data["status"]].append(system)
-            else:
-                panels[data["status"]] = [system, ]
+    repo = get_repo(token=token, name=name, org=org)
+    issues = get_issues(repo)
 
     # get the SHA of the current HEAD
     sha = repo.get_git_ref("heads/gh-pages").object.sha
@@ -137,6 +74,10 @@ def run_update(name, token, org):
         path="/template.html",
         ref=sha
     )
+
+    systems = get_systems(repo, issues)
+    incidents = get_incidents(repo, issues)
+    panels = get_panels(systems)
 
     # render the template
     template = Template(template_file.decoded_content.decode("utf-8"))
@@ -153,8 +94,8 @@ def run_update(name, token, org):
         )
 
         if is_same_content(content, base64.b64decode(index.content)):
-           click.echo("Local status matches remote status, no need to commit.")
-           return False
+            click.echo("Local status matches remote status, no need to commit.")
+            return False
 
         repo.update_file(
             path="/index.html",
@@ -172,15 +113,6 @@ def run_update(name, token, org):
             branch="gh-pages",
         )
 
-def is_same_content(c1, c2):
-    def sha1(c):
-        if PY3:
-            if isinstance(c, str):
-                c = bytes(c, "utf-8")
-        else:
-            c = c.encode()
-        return hashlib.sha1(c)
-    return sha1(c1).hexdigest() == sha1(c2).hexdigest()
 
 def run_create(name, token, systems, org):
     gh = Github(token)
@@ -267,6 +199,105 @@ def get_severity(labels):
         if label.color in label_map:
             return label_map[label.color]
     return None
+
+
+def get_panels(systems):
+    # initialize and fill the panels with affected systems
+    panels = OrderedDict()
+    for system, data in systems.items():
+        if data["status"] != "operational":
+            if data["status"] in panels:
+                panels[data["status"]].append(system)
+            else:
+                panels[data["status"]] = [system, ]
+    return panels
+
+
+def get_repo(token, name, org):
+    gh = Github(token)
+    if org:
+        return gh.get_organization(org).get_repo(name=name)
+    return gh.get_user().get_repo(name=name)
+
+
+def get_collaborators(repo):
+    return [col.login for col in repo.get_collaborators()]
+
+
+def get_systems(repo, issues):
+    systems = OrderedDict()
+    # get all systems and mark them as operational
+    for name in sorted(iter_systems(labels=repo.get_labels())):
+        systems[name] = {
+            "status": "operational",
+        }
+
+    for issue in issues:
+        if issue.state == "open":
+            labels = issue.get_labels()
+            severity = get_severity(labels)
+            affected_systems = list(iter_systems(labels))
+            # shit is hitting the fan RIGHT NOW. Mark all affected systems
+            for affected_system in affected_systems:
+                systems[affected_system]["status"] = severity
+    return systems
+
+
+def get_incidents(repo, issues):
+    # loop over all issues in the past 90 days to get current and past incidents
+    incidents = []
+    collaborators = get_collaborators(repo=repo)
+    for issue in issues:
+        labels = issue.get_labels()
+        affected_systems = sorted(iter_systems(labels))
+        severity = get_severity(labels)
+
+        # make sure that non-labeled issues are not displayed
+        if not affected_systems or severity is None:
+            continue
+
+        # make sure that the user that created the issue is a collaborator
+        if issue.user.login not in collaborators:
+            continue
+
+        # create an incident
+        incident = {
+            "created": issue.created_at,
+            "title": issue.title,
+            "systems": affected_systems,
+            "severity": severity,
+            "closed": issue.state == "closed",
+            "body": issue.body,
+            "updates": []
+        }
+
+        for comment in issue.get_comments():
+            # add comments by collaborators only
+            if comment.user.login in collaborators:
+                incident["updates"].append({
+                    "created": comment.created_at,
+                    "body": comment.body
+                })
+
+        incidents.append(incident)
+
+    # sort incidents by date
+    return sorted(incidents, key=lambda i: i["created"], reverse=True)
+
+
+def get_issues(repo):
+    return repo.get_issues(state="all", since=datetime.now() - timedelta(days=90))
+
+
+def is_same_content(c1, c2):
+    def sha1(c):
+        if PY3:
+            if isinstance(c, str):
+                c = bytes(c, "utf-8")
+        else:
+            c = c.encode()
+        return hashlib.sha1(c)
+    return sha1(c1).hexdigest() == sha1(c2).hexdigest()
 
 
 if __name__ == '__main__':  # pragma: no cover
