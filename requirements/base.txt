@@ -1,4 +1,4 @@
-pygithub-redux==1.30.0
+pygithub-redux==1.31.0
 click==6.6
 jinja2==2.8
 tqdm==4.8.1
