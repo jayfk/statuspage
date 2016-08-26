@@ -38,7 +38,7 @@ You'll be prompted for a repo name and the systems you want to show a status for
     Name: mystatuspage
     Systems, eg (Website,API): Website, CDN, API
     
-*Please note: This will generate a new repo under that name. Make sure it doesn't exist.*
+*Please note: This will generate a new repo under that name. Make sure it doesn't exist already.*
     
 The command takes a couple of seconds to run. Once ready, it will output links to the issue tracker and your new status page.
 
