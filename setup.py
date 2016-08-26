@@ -14,10 +14,11 @@ with io.open('CHANGELOG.md', 'r', encoding='utf-8') as history_file:
     history = history_file.read()
 
 requirements = [
-    'pygithub-redux>=1.30.0',
+    'pygithub',
     'click',
     'jinja2',
     'tqdm',
+    'requests'
 ]
 
 long_description = readme + '\n\n' + history

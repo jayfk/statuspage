@@ -2,6 +2,12 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0 [2016-07-26]
+- Added an option to automate the update process.
+- Switch to PyGithub as pygithub-redux is no longer needed
+- Added an option to create private repositories
+- Beefed up the docs
+
 ## 0.5.1 [2016-07-26]
 - Updated dependencies: tqdm and pygithub-redux
 

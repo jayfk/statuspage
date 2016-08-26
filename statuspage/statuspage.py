@@ -5,7 +5,8 @@ import sys, os
 import hashlib
 import base64
 from datetime import datetime, timedelta
-
+import requests
+from requests.exceptions import ConnectionError
 from github import Github, UnknownObjectException
 import click
 from jinja2 import Template
@@ -48,8 +49,9 @@ def cli():  # pragma: no cover
 @click.option('--token', prompt='GitHub API Token', help='')
 @click.option('--org', help='GitHub Organization', default=False)
 @click.option('--systems', prompt='Systems, eg (Website,API)', help='')
-def create(token, name, systems, org):
-    run_create(name=name, token=token, systems=systems, org=org)
+@click.option('--private/--public', default=False)
+def create(token, name, systems, org, private):
+    run_create(name=name, token=token, systems=systems, org=org, private=private)
 
 
 @cli.command()
@@ -58,6 +60,14 @@ def create(token, name, systems, org):
 @click.option('--token', prompt='GitHub API Token', help='')
 def update(name, token, org):
     run_update(name=name, token=token, org=org)
+
+@cli.command()
+@click.option('--name', prompt='Name', help='')
+@click.option('--org', help='GitHub Organization', default=False)
+@click.option('--token', prompt='GitHub API Token', help='')
+@click.option('--key', prompt='Key', help='', default=None)
+def automate(name, token, org, key):
+    run_automate(name=name, token=token, org=org, key=key)
 
 
 def run_update(name, token, org):
@@ -114,7 +124,7 @@ def run_update(name, token, org):
         )
 
 
-def run_create(name, token, systems, org):
+def run_create(name, token, systems, org, private):
     gh = Github(token)
 
     if org:
@@ -123,7 +133,7 @@ def run_create(name, token, systems, org):
         entity = gh.get_user()
 
     # create the repo
-    repo = entity.create_repo(name=name)
+    repo = entity.create_repo(name=name, private=private)
 
     # get all labels an delete them
     for label in tqdm(list(repo.get_labels()), "Deleting initial labels"):
@@ -168,7 +178,7 @@ def run_create(name, token, systems, org):
     # run an initial update to add content to the index
     run_update(token=token, name=name, org=org)
 
-    click.echo("Create new issues at https://github.com/{login}/{name}/issues".format(
+    click.echo("\nCreate new issues at https://github.com/{login}/{name}/issues".format(
         login=entity.login,
         name=name
     ))
@@ -177,14 +187,52 @@ def run_create(name, token, systems, org):
         name=name
     ))
 
-    click.echo("")
-    click.echo("###############################################################################")
-    click.echo("# IMPORTANT: Whenever you add or close an issue you have to run the update    #")
-    click.echo("# command to show the changes reflected on your status page.                  #")
-    click.echo("# Here's a one-off command for this repo to safe it somewhere safe:           #")
-    click.echo("# statuspage update --name={name} --token={token} {org}".format(
+    click.secho("\nYour status page is now set up and ready!\n", fg="green")
+    click.echo("Please note: You need to run the 'statuspage update' command whenever you update or create an issue.\n")
+    click.echo("There is a small service available ($39/year) that does that "
+               "automatically for you.")
+    if click.confirm("Set up automation?"):
+        click.secho("\nAwesome!\n\n", fg="green")
+        run_automate(name=name, token=token, org=org)
+    else:
+        click.echo("\nIn order to update this status page, run the following command:")
+        click.echo("statuspage update --name={name} --token={token} {org}".format(
             name=name, token=token, org="--org=" + entity.login if org else ""))
-    click.echo("###############################################################################")
+        click.echo("")
+        click.echo("In case you want to set up automation later, run:")
+        click.echo("statuspage automate --name={name} --token={token} {org}".format(
+            name=name, token=token, org="--org=" + entity.login if org else ""))
+
+
+def run_automate(name, token, org, key=None):
+
+    if not key:
+        click.echo("If you don't have a key to use the backend service, go to "
+                   "https://www.statuspage-backend.com to purchase one.\n")
+        key = click.prompt('Key')
+
+    data = {
+        "name": name,
+        "token": token,
+        "org": org,
+        "key": key
+    }
+    try:
+        r = requests.post("https://www.statuspage-backend.com/register", json=data)
+    except ConnectionError:
+        click.secho("The backend server is not available. Please try again later.", fg="red")
+        return
+    try:
+        data = r.json()
+    except ValueError:
+        click.secho("There was an error communicating with the backend server.", fg="red")
+        return
+
+    if not data.get("success", False):
+        click.secho("Error: {}".format(data.get("error", "Unknown Error.")), fg="red")
+        return
+
+    click.secho("Automation activated.", fg="green")
 
 
 def iter_systems(labels):
