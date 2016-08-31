@@ -18,7 +18,8 @@ requirements = [
     'click',
     'jinja2',
     'tqdm',
-    'requests'
+    'requests',
+    'markdown2'
 ]
 
 long_description = readme + '\n\n' + history

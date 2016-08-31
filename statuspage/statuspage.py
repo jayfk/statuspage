@@ -12,6 +12,7 @@ import click
 from jinja2 import Template
 from tqdm import tqdm
 from collections import OrderedDict
+import markdown2
 
 __version__ = "0.6.0"
 
@@ -72,7 +73,6 @@ def automate(name, token, org, key):
 
 def run_update(name, token, org):
     click.echo("Generating..")
-
     repo = get_repo(token=token, name=name, org=org)
     issues = get_issues(repo)
 
@@ -315,7 +315,7 @@ def get_incidents(repo, issues):
             "systems": affected_systems,
             "severity": severity,
             "closed": issue.state == "closed",
-            "body": issue.body,
+            "body": markdown2.markdown(issue.body),
             "updates": []
         }
 
@@ -324,7 +324,7 @@ def get_incidents(repo, issues):
             if comment.user.login in collaborators:
                 incident["updates"].append({
                     "created": comment.created_at,
-                    "body": comment.body
+                    "body": markdown2.markdown(comment.body)
                 })
 
         incidents.append(incident)

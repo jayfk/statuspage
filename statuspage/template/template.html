@@ -68,11 +68,10 @@
 						<hr/>
 
 						<span class="title">{{ incident.title }}</span>
-						<p>{{ incident.body }}</p>
+						{{ incident.body|safe }}
 						{% for update in incident.updates %}
-							<p><em>Update {{ update.created }}</em><br/>
-							{{ update.body }}
-							</p>
+							<p><em>Update {{ update.created }}</em></p>
+							{{ update.body|safe }}
 						{% endfor %}
 					</div>
 					{% endfor %}
@@ -86,7 +85,7 @@
 				<section class="container">
 					<hr/>
 					{# you might want to replace this with a link to your website or something #}
-					<p>Status page hosted by GitHub, generated with <a href="https://github.com/pyupio/statuspage">pyupio/statuspage</a></p>
+					<p>Status page hosted by GitHub, generated with <a href="https://github.com/jayfk/statuspage">jayfk/statuspage</a></p>
 				</section>
 			</footer>
 

@@ -2,6 +2,9 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.7.0 [2016-07-31]
+- Added markdown support.
+
 ## 0.6.0 [2016-07-26]
 - Added an option to automate the update process.
 - Switch to PyGithub as pygithub-redux is no longer needed
