@@ -35,7 +35,8 @@ SYSTEM_LABEL_COLOR = "171717"
 
 TEMPLATES = [
     "template.html",
-    "style.css"
+    "style.css",
+    "statuspage.js",
 ]
 
 

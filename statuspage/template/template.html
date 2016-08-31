@@ -6,7 +6,6 @@
 		<title>Status</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
-		<link rel="stylesheet" href="milligram.min.css">
 		<link rel="stylesheet" href="style.css">
 		{# upload your own favicon.png to the root of your repo and replace with href="favicon.png" #}
 		<link rel="icon" href="https://raw.githubusercontent.com/pyupio/statuspage/master/template/favicon.png">
@@ -55,7 +54,7 @@
 				{% if incidents %}
 					{% for incident in incidents %}
 					<div class="incident">
-						<span class="date">{{ incident.created }} UTC</span>
+						<span class="date moment">{{ incident.created }} UTC</span>
 
 						{% if incident.closed %}
 							<span class="label operational float-right">resolved</span>
@@ -70,7 +69,7 @@
 						<span class="title">{{ incident.title }}</span>
 						{{ incident.body|safe }}
 						{% for update in incident.updates %}
-							<p><em>Update {{ update.created }}</em></p>
+							<p><em>Update <span class="moment">{{ update.created }} UTC</span></em></p>
 							{{ update.body|safe }}
 						{% endfor %}
 					</div>
@@ -90,6 +89,6 @@
 			</footer>
 
 		</main>
-
+		<script src="statuspage.js" type="text/javascript"></script>
 	</body>
 </html>
