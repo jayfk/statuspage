@@ -62,6 +62,15 @@ def create(token, name, systems, org, private):
 def update(name, token, org):
     run_update(name=name, token=token, org=org)
 
+
+@cli.command()
+@click.option('--name', prompt='Name', help='')
+@click.option('--org', help='GitHub Organization', default=False)
+@click.option('--token', prompt='GitHub API Token', help='')
+def upgrade(name, token, org):
+    run_upgrade(name=name, token=token, org=org)
+
+
 @cli.command()
 @click.option('--name', prompt='Name', help='')
 @click.option('--org', help='GitHub Organization', default=False)
@@ -69,6 +78,38 @@ def update(name, token, org):
 @click.option('--key', prompt='Key', help='', default=None)
 def automate(name, token, org, key):
     run_automate(name=name, token=token, org=org, key=key)
+
+
+def run_upgrade(name, token, org):
+    click.echo("Upgrading...")
+
+    repo = get_repo(token=token, name=name, org=org)
+    files = [file.path for file in repo.get_dir_contents("/", ref="gh-pages")]
+    head_sha = repo.get_git_ref("heads/gh-pages").object.sha
+
+    # add all the template files to the gh-pages branch
+    for template in tqdm(TEMPLATES, desc="Updating template files"):
+        with open(os.path.join(ROOT, "template", template), "r") as f:
+            content = f.read()
+            if template in files:
+                template_sha = repo.get_file_contents(
+                    path="/" + template,
+                    ref=head_sha,
+                ).sha
+                repo.update_file(
+                    path="/" + template,
+                    sha=template_sha,
+                    message="upgrade",
+                    content=content,
+                    branch="gh-pages"
+                )
+            else:
+                repo.create_file(
+                    path="/" + template,
+                    message="upgrade",
+                    content=content,
+                    branch="gh-pages"
+                )
 
 
 def run_update(name, token, org):
