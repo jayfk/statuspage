@@ -3,12 +3,11 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="robots" content="index, follow">
-		<title>Status</title>
+		<title>{{ config.title }}</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
 		<link rel="stylesheet" href="style.css">
-		{# upload your own favicon.png to the root of your repo and replace with href="favicon.png" #}
-		<link rel="icon" href="https://raw.githubusercontent.com/pyupio/statuspage/master/template/favicon.png">
+		<link rel="icon" href="{{ config.favicon }}">
 	</head>
 	<body>
 
@@ -18,9 +17,8 @@
 				<section class="container">
 
 					<a class="navigation-title" href="">
-						{# upload your own logo.png to the root of your repo and replace with src="logo.png" #}
-						<img class="img" src="https://raw.githubusercontent.com/pyupio/statuspage/master/template/logo.png" height="30">
-						<h1 class="title">Status</h1>
+						<img class="img" src="{{ config.logo }}" height="30">
+						<h1 class="title">{{ config.title }}</h1>
 					</a>
 
 
@@ -83,8 +81,7 @@
 			<footer class="footer">
 				<section class="container">
 					<hr/>
-					{# you might want to replace this with a link to your website or something #}
-					<p>Status page hosted by GitHub, generated with <a href="https://github.com/jayfk/statuspage">jayfk/statuspage</a></p>
+					<p>{{ config.footer }}</p>
 				</section>
 			</footer>
 

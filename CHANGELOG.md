@@ -5,7 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 0.7.0 [2016-07-31]
 - Added markdown support.
 - Added upgrade command.
-- Added support for localtime. 
+- Added support for localtime.
+- Added support for a config file.
 
 ## 0.6.0 [2016-07-26]
 - Added an option to automate the update process.

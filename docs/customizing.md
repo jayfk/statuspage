@@ -9,15 +9,20 @@ or, on the website, select the `gh-pages` branch before editing things.
 
 ### Template
 
-The template is fully customizable, edit `template.html`.
+Don't edit the `template.html` file directly, as it will change with each upgrade.
 
-### Logo
+Instead, create a file called `config.json` in the root of your repository and change the defaults. Don't forget to run `statuspage update` afterwards.
 
-Add a `logo.png` to your repo's root and change `template.html` to point to that file.
+```javascript
+{
+    "footer": "Status page hosted by GitHub, generated with <a href='https://github.com/jayfk/statuspage'>jayfk/statuspage</a>",
+    "logo": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/logo.png",
+    "title": "Status",
+    "favicon": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/favicon.png"
+}
+```
 
-### CSS
-
-CSS is located at `style.css` in the root directory. Just edit it and commit the file.
+Please note: `config.json` has to be valid JSON. The best way to validate it online is at [jsonlint.com](http://jsonlint.com/).
 
 ### Use a subdomain
 

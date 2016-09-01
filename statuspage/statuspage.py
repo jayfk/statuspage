@@ -13,6 +13,7 @@ from jinja2 import Template
 from tqdm import tqdm
 from collections import OrderedDict
 import markdown2
+import json
 
 __version__ = "0.6.0"
 
@@ -38,6 +39,13 @@ TEMPLATES = [
     "style.css",
     "statuspage.js",
 ]
+
+DEFAULT_CONFIG = {
+    "footer": "Status page hosted by GitHub, generated with <a href='https://github.com/jayfk/statuspage'>jayfk/statuspage</a>",
+    "logo": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/logo.png",
+    "title": "Status",
+    "favicon": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/favicon.png"
+}
 
 
 @click.group()
@@ -85,7 +93,7 @@ def run_upgrade(name, token, org):
     click.echo("Upgrading...")
 
     repo = get_repo(token=token, name=name, org=org)
-    files = [file.path for file in repo.get_dir_contents("/", ref="gh-pages")]
+    files = get_files(repo=repo)
     head_sha = repo.get_git_ref("heads/gh-pages").object.sha
 
     # add all the template files to the gh-pages branch
@@ -132,9 +140,10 @@ def run_update(name, token, org):
     panels = get_panels(systems)
 
     # render the template
+    config = get_config(repo)
     template = Template(template_file.decoded_content.decode("utf-8"))
     content = template.render({
-        "systems": systems, "incidents": incidents, "panels": panels
+        "systems": systems, "incidents": incidents, "panels": panels, "config": config
     })
 
     # create/update the index.html with the template
@@ -281,6 +290,31 @@ def iter_systems(labels):
     for label in labels:
         if label.color == SYSTEM_LABEL_COLOR:
             yield label.name
+
+
+def get_files(repo):
+    """
+    Get a list of all files.
+    """
+    return [file.path for file in repo.get_dir_contents("/", ref="gh-pages")]
+
+
+def get_config(repo):
+    """
+    Get the config for the repo, merged with the default config. Returns the default config if
+    no config file is found.
+    """
+    files = get_files(repo)
+    config = DEFAULT_CONFIG
+    if "config.json" in files:
+        # get the config file, parse JSON and merge it with the default config
+        config_file = repo.get_file_contents('/config.json', ref="gh-pages")
+        try:
+            repo_config = json.loads(config_file.decoded_content.decode("utf-8"))
+            config.update(repo_config)
+        except ValueError:
+            click.secho("WARNING: Unable to parse config file. Using defaults.", fg="yellow")
+    return config
 
 
 def get_severity(labels):
