@@ -81,6 +81,20 @@ In order to add or remove a system, run:
     statuspage add_system --token=<token> --name=<repo> --system=<system to add>
     statuspage remove_system --token=<token> --name=<repo> --system=<system to remove>
 
+## Upgrading from previous versions
+
+First, install the latest version with pip, or grab the latest [binary](docs/installation.md):
+
+    pip install statuspage --upgrade
+
+Updating your page to the latest version is now as simple as running:
+
+    statuspage upgrade --token=<token> --name=<repo>
+
+Followed by an update:
+    
+    statuspage upgrade --token=<token> --name=<repo>
+
 ## Customizing
 See [customizing](docs/customizing.md)
 
