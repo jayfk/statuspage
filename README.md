@@ -91,9 +91,9 @@ Updating your page to the latest version is now as simple as running:
 
     statuspage upgrade --token=<token> --name=<repo>
 
-Followed by an update:
+followed by an update:
     
-    statuspage upgrade --token=<token> --name=<repo>
+    statuspage update --token=<token> --name=<repo>
 
 ## Translations
 The generated status page is translated via JavaScript on the client side using [webL10n](https://github.com/fabi1cazenave/webL10n). It detects the visitors preferred language and translates all strings automatically. 
