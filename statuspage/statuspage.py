@@ -15,7 +15,7 @@ from collections import OrderedDict
 import markdown2
 import json
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
 
 try:
     ROOT = sys._MEIPASS
