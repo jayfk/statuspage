@@ -74,6 +74,13 @@ Now, update your status page. Go back to your commandline and type:
 If you change the issue (eg. when you add a new label, create a comment or close the issue), you'll
 need to run `statuspage update` again.
 
+## Adding and removing systems
+
+In order to add or remove a system, run:
+
+    statuspage add_system --token=<token> --name=<repo> --system=<system to add>
+    statuspage remove_system --token=<token> --name=<repo> --system=<system to remove>
+
 ## Customizing
 See [customizing](docs/customizing.md)
 

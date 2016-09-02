@@ -7,7 +7,7 @@ import base64
 from datetime import datetime, timedelta
 import requests
 from requests.exceptions import ConnectionError
-from github import Github, UnknownObjectException
+from github import Github, UnknownObjectException, GithubException
 import click
 from jinja2 import Template
 from tqdm import tqdm
@@ -85,9 +85,62 @@ def upgrade(name, token, org):
 @click.option('--name', prompt='Name', help='')
 @click.option('--org', help='GitHub Organization', default=False)
 @click.option('--token', prompt='GitHub API Token', help='')
+@click.option('--system', prompt='System', help='System to add')
+@click.option('--prompt/--no-prompt', default=True)
+def add_system(name, token, org, system, prompt):
+    run_add_system(name=name, token=token, org=org, system=system, prompt=prompt)
+
+
+@cli.command()
+@click.option('--name', prompt='Name', help='')
+@click.option('--org', help='GitHub Organization', default=False)
+@click.option('--token', prompt='GitHub API Token', help='')
+@click.option('--system', prompt='System', help='System to remove')
+@click.option('--prompt/--no-prompt', default=True)
+def remove_system(name, token, org, system, prompt):
+    run_remove_system(name=name, token=token, org=org, system=system, prompt=prompt)
+
+
+@cli.command()
+@click.option('--name', prompt='Name', help='')
+@click.option('--org', help='GitHub Organization', default=False)
+@click.option('--token', prompt='GitHub API Token', help='')
 @click.option('--key', prompt='Key', help='', default=None)
 def automate(name, token, org, key):
     run_automate(name=name, token=token, org=org, key=key)
+
+
+def run_add_system(name, token, org, system, prompt):
+    """
+    Adds a new system to the repo.
+    """
+    repo = get_repo(token=token, org=org, name=name)
+    try:
+        repo.create_label(name=system.strip(), color=SYSTEM_LABEL_COLOR)
+        click.secho("Successfully added new system {}".format(system), fg="green")
+        if prompt and click.confirm("Run update to re-generate the page?"):
+            run_update(name=name, token=token, org=org)
+    except GithubException as e:
+        if e.status == 422:
+            click.secho(
+                "Unable to add new system {}, it already exists.".format(system), fg="yellow")
+            return
+        raise
+
+
+def run_remove_system(name, token, org, system, prompt):
+    """
+    Removes a system from the repo.
+    """
+    repo = get_repo(token=token, org=org, name=name)
+    try:
+        label = repo.get_label(name=system.strip())
+        label.delete()
+        click.secho("Successfully deleted {}".format(system), fg="green")
+        if prompt and click.confirm("Run update to re-generate the page?"):
+            run_update(name=name, token=token, org=org)
+    except UnknownObjectException:
+        click.secho("Unable to remove system {}, it does not exist.".format(system), fg="yellow")
 
 
 def run_upgrade(name, token, org):

@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 0.8.0 [2016-09-2]
 - Added client side translation.
 - Added german translation.
+- It's now possible to add/remove systems from the CLI.
 
 ## 0.7.0 [2016-07-31]
 - Added markdown support.
