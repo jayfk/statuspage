@@ -106,7 +106,7 @@ Translations are available for the following languages:
 Want to add a translation? Open `translations.ini` and add it. Pull requests welcome!
 
 ## Customizing
-To change styles, the logo go here: [customizing](docs/customizing.md)
+Want to change styles, the logo, or the footer? Check out [customizing](docs/customizing.md).
 
 ## Options
 
