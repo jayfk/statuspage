@@ -38,6 +38,7 @@ TEMPLATES = [
     "template.html",
     "style.css",
     "statuspage.js",
+    "translations.ini"
 ]
 
 DEFAULT_CONFIG = {

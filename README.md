@@ -79,3 +79,13 @@ See [customizing](docs/customizing.md)
 
 ## Options
 See [options](docs/options.md)
+
+## Translations
+The generated status page is translated via JavaScript on the client side using [webL10n](https://github.com/fabi1cazenave/webL10n). It detects the visitors preferred language and translates all strings automatically. 
+
+Translations are available for the following languages: 
+
+- en
+- de
+
+Want to add a translation? Open `translations.ini` and add it. Pull requests welcome!

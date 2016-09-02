@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html>
 	<head>
 		<meta charset="utf-8">
 		<meta name="robots" content="index, follow">
@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
 		<link rel="stylesheet" href="style.css">
 		<link rel="icon" href="{{ config.favicon }}">
+		<link rel="prefetch" type="application/l10n" href="translations.ini" />
 	</head>
 	<body>
 
@@ -28,36 +29,36 @@
 
 			<section class="container" id="main">
 				{% if not panels %}
-					<div class="panel operational">
+					<div class="panel operational" data-l10n-id="systems-operational">
 						All Systems operational.
 					</div>
 				{% else %}
 					{% for severity, systems in panels.items() if systems %}
 					<div class="panel {{ severity }}">
-						{{ severity.capitalize() }} on {% for system in systems %}{{ system }}{% if not loop.last %}, {% endif %}{% endfor %}.
+						<span data-l10n-id="{{ severity.capitalize().replace(" ", '-') }}">{{ severity.capitalize() }}</span> <span data-l10n-id="on">on</span> {% for system in systems %}{{ system }}{% if not loop.last %}, {% endif %}{% endfor %}.
 					</div>
 					{% endfor %}
 				{% endif %}
 
-				<h4>Systems</h4>
+				<h4 data-l10n-id="systems">Systems</h4>
 				<ul class="systems">
 					{% for system, data in systems.items() %}
 					<li>
-						{{ system }} <span class="status {{ data.status }}">{{ data.status }}</span>
+						{{ system }} <span class="status {{ data.status }}" data-l10n-id="{{ data.status.replace(" ", '-') }}">{{ data.status }}</span>
 					</li>
 					{% endfor %}
 				</ul>
 
-				<h4>Incidents</h4>
+				<h4 data-l10n-id="incidents">Incidents</h4>
 				{% if incidents %}
 					{% for incident in incidents %}
 					<div class="incident">
 						<span class="date moment">{{ incident.created }} UTC</span>
 
 						{% if incident.closed %}
-							<span class="label operational float-right">resolved</span>
+							<span class="label operational float-right" data-l10n-id="resolved">resolved</span>
 						{% else %}
-							<span class="label {{ incident.severity }} float-right">{{ incident.severity }}</span>
+							<span class="label {{ incident.severity }} float-right" data-l10n-id="{{ incident.severity.replace(" ", '-') }}">{{ incident.severity }}</span>
 						{% endif %}
 						{% for system in incident.systems %}
 							<span class="label system float-right">{{ system }}</span>
@@ -73,7 +74,7 @@
 					</div>
 					{% endfor %}
 				{% else %}
-					<em>No incidents in the past 90 days.</em>
+					<em data-l10n-id="no.incidents">No incidents in the past 90 days.</em>
 				{% endif %}
 			</section>
 
