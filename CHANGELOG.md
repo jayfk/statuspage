@@ -2,6 +2,9 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.8.1 [2016-09-6]
+- Fixed a silly encoding error on legacy python
+
 ## 0.8.0 [2016-09-2]
 - Added client side translation.
 - Added german translation.

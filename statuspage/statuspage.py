@@ -473,7 +473,7 @@ def is_same_content(c1, c2):
             if isinstance(c, str):
                 c = bytes(c, "utf-8")
         else:
-            c = c.encode()
+            c = c.encode("utf-8")
         return hashlib.sha1(c)
     return sha1(c1).hexdigest() == sha1(c2).hexdigest()
 
