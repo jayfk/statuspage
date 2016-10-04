@@ -237,8 +237,13 @@ def run_create(name, token, systems, org, private):
     else:
         entity = gh.get_user()
 
+    description="Visit this site at https://{login}.github.io/{name}/".format(
+        login=entity.login,
+        name=name
+    )
+
     # create the repo
-    repo = entity.create_repo(name=name, private=private)
+    repo = entity.create_repo(name=name, description=description, private=private)
 
     # get all labels an delete them
     for label in tqdm(list(repo.get_labels()), "Deleting initial labels"):
@@ -257,10 +262,7 @@ def run_create(name, token, systems, org, private):
     repo.create_file(
         path="/README.md",
         message="initial",
-        content="Visit this site at https://{login}.github.io/{name}/".format(
-            login=entity.login,
-            name=name
-        ),
+        content=description,
     )
 
     # create the gh-pages branch
