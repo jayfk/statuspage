@@ -5,7 +5,7 @@ from datetime import datetime
 from unittest import TestCase
 from mock import patch, Mock
 from click.testing import CliRunner
-from statuspage import cli, update, create, iter_systems, get_severity, SYSTEM_LABEL_COLOR
+from statuspage import cli, update, upgrade, create, iter_systems, get_severity, SYSTEM_LABEL_COLOR
 from github import UnknownObjectException
 import codecs
 
@@ -168,6 +168,16 @@ class CLITestCase(TestCase):
         # make sure that get_comments is not called for the first issue but for the second
         self.issue.get_comments.assert_not_called()
         self.issue1.get_comments.assert_called_once_with()
+
+    def test_dont_upgrade_when_nothing_changes(self):
+        runner = CliRunner()
+        self.template.content = codecs.encode(b"some foo", "base64")
+        result = runner.invoke(upgrade, ["--name", "testrepo", "--token", "token"])
+        self.assertEqual(result.exit_code, 0)
+        self.gh.assert_called_with("token")
+        self.gh().get_user().get_repo.assert_called_with(name="testrepo")
+        self.gh().get_user().get_repo().get_labels.assert_called_once_with()
+        self.gh().get_user().get_repo().update_file.assert_not_called()
 
 
 class UtilTestCase(TestCase):
