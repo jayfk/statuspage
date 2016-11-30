@@ -155,17 +155,21 @@ def run_upgrade(name, token, org):
         with open(os.path.join(ROOT, "template", template), "r") as f:
             content = f.read()
             if template in files:
-                template_sha = repo.get_file_contents(
+                repo_template = repo.get_file_contents(
                     path="/" + template,
                     ref=head_sha,
-                ).sha
-                repo.update_file(
-                    path="/" + template,
-                    sha=template_sha,
-                    message="upgrade",
-                    content=content,
-                    branch="gh-pages"
                 )
+                if not is_same_content(
+                    content,
+                    base64.b64decode(repo_template.content)
+                ):
+                    repo.update_file(
+                        path="/" + template,
+                        sha=repo_template.sha,
+                        message="upgrade",
+                        content=content,
+                        branch="gh-pages"
+                    )
             else:
                 repo.create_file(
                     path="/" + template,
