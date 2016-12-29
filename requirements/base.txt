@@ -1,6 +1,6 @@
 pygithub==1.29
 click==6.6
-jinja2==2.8
+jinja2==2.8.1
 tqdm==4.8.4
 requests==2.11.1
 markdown2==2.3.2
