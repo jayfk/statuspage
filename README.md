@@ -45,15 +45,7 @@ The command takes a couple of seconds to run. Once ready, it will output links t
     Create new issues at https://github.com/<login>/mystatuspage/issues
     Visit your new status page at https://<login>.github.com/mystatuspage/
 
-Next, you will be asked if you want to automate the update process, so that you don't have to run
-the `statuspage update` command whenever you change anything on your repo.
-
-    Set up automation? [y/N]: y
-
-If you want use the service, choose `y` and grab a key at the [shop](https://www.statuspage-backend.com).
-
-If you don't want to use the service, choose `n`. The generator will then print the `statuspage update`
-command filled with all the details you need to update your page.
+The generator will then print the `statuspage update` command filled with all the details you need to update your page.
 
 ## Create an issue
 
