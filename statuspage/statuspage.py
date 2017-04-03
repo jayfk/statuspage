@@ -101,15 +101,6 @@ def remove_system(name, token, org, system, prompt):
     run_remove_system(name=name, token=token, org=org, system=system, prompt=prompt)
 
 
-@cli.command()
-@click.option('--name', prompt='Name', help='')
-@click.option('--org', help='GitHub Organization', default=False)
-@click.option('--token', prompt='GitHub API Token', help='')
-@click.option('--key', prompt='Key', help='', default=None)
-def automate(name, token, org, key):
-    run_automate(name=name, token=token, org=org, key=key)
-
-
 def run_add_system(name, token, org, system, prompt):
     """
     Adds a new system to the repo.
@@ -300,50 +291,11 @@ def run_create(name, token, systems, org, private):
 
     click.secho("\nYour status page is now set up and ready!\n", fg="green")
     click.echo("Please note: You need to run the 'statuspage update' command whenever you update or create an issue.\n")
-    click.echo("There is a small service available ($39/year) that does that "
-               "automatically for you.")
-    if click.confirm("Set up automation?"):
-        click.secho("\nAwesome!\n\n", fg="green")
-        run_automate(name=name, token=token, org=org)
-    else:
-        click.echo("\nIn order to update this status page, run the following command:")
-        click.echo("statuspage update --name={name} --token={token} {org}".format(
-            name=name, token=token, org="--org=" + entity.login if org else ""))
-        click.echo("")
-        click.echo("In case you want to set up automation later, run:")
-        click.echo("statuspage automate --name={name} --token={token} {org}".format(
+
+    click.echo("\nIn order to update this status page, run the following command:")
+    click.echo("statuspage update --name={name} --token={token} {org}".format(
             name=name, token=token, org="--org=" + entity.login if org else ""))
 
-
-def run_automate(name, token, org, key=None):
-
-    if not key:
-        click.echo("If you don't have a key to use the backend service, go to "
-                   "https://www.statuspage-backend.com to purchase one.\n")
-        key = click.prompt('Key')
-
-    data = {
-        "name": name,
-        "token": token,
-        "org": org,
-        "key": key
-    }
-    try:
-        r = requests.post("https://www.statuspage-backend.com/register", json=data)
-    except ConnectionError:
-        click.secho("The backend server is not available. Please try again later.", fg="red")
-        return
-    try:
-        data = r.json()
-    except ValueError:
-        click.secho("There was an error communicating with the backend server.", fg="red")
-        return
-
-    if not data.get("success", False):
-        click.secho("Error: {}".format(data.get("error", "Unknown Error.")), fg="red")
-        return
-
-    click.secho("Automation activated.", fg="green")
 
 
 def iter_systems(labels):
