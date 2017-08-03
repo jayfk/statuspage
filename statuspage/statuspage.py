@@ -152,7 +152,7 @@ def run_upgrade(name, token, org):
                 )
                 if not is_same_content(
                     content,
-                    base64.b64decode(repo_template.content)
+                    base64.b64decode(repo_template.content).decode('utf-8')
                 ):
                     repo.update_file(
                         path="/" + template,
@@ -203,7 +203,7 @@ def run_update(name, token, org):
             ref=sha,
         )
 
-        if is_same_content(content, base64.b64decode(index.content)):
+        if is_same_content(content, base64.b64decode(index.content).decode('utf-8')):
             click.echo("Local status matches remote status, no need to commit.")
             return False
 
