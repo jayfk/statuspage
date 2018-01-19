@@ -51,6 +51,7 @@ The generator will then print the `statuspage update` command filled with all th
 
 To create a new issue, go to your newly created repo and click on `New Issue`.
 
+
 - Click on the cog icon next to labels on the right.
 - Choose the affected systems (black labels)
 - Choose a severity label (major outage, degraded performance, investigating)
@@ -94,7 +95,10 @@ Translations are available for the following languages:
 
 - en
 - de
+- nl
 - pt
+- es
+- pl
 
 Want to add a translation? Open `translations.ini` and add it. Pull requests welcome!
 
