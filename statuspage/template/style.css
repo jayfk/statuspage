@@ -38,7 +38,7 @@ blockquote *:last-child {
 }
 
 .title {
-  font-family: unset !important;
+  font-family: "Arial" !important;
 }
 
 .button,
