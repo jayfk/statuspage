@@ -1,5 +1,5 @@
-pygithub==1.34
-pygithub==1.34
+pygithub==1.44.1
+pygithub==1.44.1
 jinja2==2.9.6
 click==7.0
 tqdm==4.15.0
