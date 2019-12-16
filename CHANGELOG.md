@@ -2,6 +2,13 @@
 All enhancements and patches to statuspage will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.0 [2016-09-6]
+- Added polish translation, thanks @4364354235654345u5432576865432
+- Added russian translation, thanks @sobolevn
+- Fixed a localisation bug, thanks @martignoni
+- Added french localisation, thanks @FleuryK
+- Updated dependencies: jinja, requests, pygithub, click
+
 ## 0.8.1 [2016-09-6]
 - Fixed a silly encoding error on legacy python
 
