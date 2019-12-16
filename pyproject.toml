@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "statuspage"
+version = "1.0"
+description = "A statuspage generator that lets you host your statuspage for free on Github."
+authors = ["Jannis Gebauer <ja.geb@me.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.5"
+tqdm = "4.15.0"
+pygithub = "1.44.1"
+markdown2 = "2.3.8"
+jinja2 = "2.10.3"
+requests = "2.22.0"
+click = "7.0"
+
+[tool.poetry.dev-dependencies]
+mock = "3.0.5"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
