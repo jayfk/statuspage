@@ -21,10 +21,10 @@ endif
 	git tag $(version)
 	git push origin master --tags
 	make all
-	python setup.py sdist bdist_wheel upload
-	github-release release --user $(GITHUB_USER) --repo $(GITHUB_REPO) --tag $(version) --name $(version)
-	github-release upload --user $(GITHUB_USER) --repo $(GITHUB_REPO) --tag $(version) --name 'statuspage-darwin-64' --file dist/statuspage-darwin-64
-	github-release upload --user $(GITHUB_USER) --repo $(GITHUB_REPO) --tag $(version) --name 'statuspage-linux-64' --file dist/statuspage-linux-64
+	#python setup.py sdist bdist_wheel upload
+	#github-release release --user $(GITHUB_USER) --repo $(GITHUB_REPO) --tag $(version) --name $(version)
+	#github-release upload --user $(GITHUB_USER) --repo $(GITHUB_REPO) --tag $(version) --name 'statuspage-darwin-64' --file dist/statuspage-darwin-64
+	#github-release upload --user $(GITHUB_USER) --repo $(GITHUB_REPO) --tag $(version) --name 'statuspage-linux-64' --file dist/statuspage-linux-64
 	
 
 osx:
