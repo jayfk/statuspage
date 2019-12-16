@@ -6,3 +6,4 @@ __pycache__/
 src
 dist
 *.egg-info
+.idea
