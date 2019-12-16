@@ -1,7 +1,5 @@
 # Statuspage
 
-[![Updates](https://pyup.io/repos/github/jayfk/statuspage/shield.svg)](https://pyup.io/repos/github/jayfk/statuspage/)
-[![Python 3](https://pyup.io/repos/github/jayfk/statuspage/python-3-shield.svg)](https://pyup.io/repos/github/jayfk/statuspage/)
 [![Build Status](https://travis-ci.org/jayfk/statuspage.svg?branch=master)](https://travis-ci.org/jayfk/statuspage)
 [![codecov.io](https://codecov.io/github/jayfk/statuspage/coverage.svg?branch=master)](https://codecov.io/github/jayfk/statuspage?branch=master)
 
