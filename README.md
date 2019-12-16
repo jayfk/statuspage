@@ -94,7 +94,12 @@ Translations are available for the following languages:
 
 - en
 - de
+- nl
 - pt
+- es
+- ru
+- fr
+- pl
 
 Want to add a translation? Open `translations.ini` and add it. Pull requests welcome!
 
