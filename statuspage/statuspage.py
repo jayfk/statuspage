@@ -17,10 +17,7 @@ import json
 
 __version__ = "1.0"
 
-try:
-    ROOT = sys._MEIPASS
-except AttributeError:
-    ROOT = os.path.dirname(os.path.realpath(__file__))
+ROOT = os.path.dirname(os.path.realpath(__file__))
 
 PY3 = sys.version_info >= (3, 0)
 
@@ -255,7 +252,7 @@ def run_create(name, token, systems, org, private):
     # add an empty file to master, otherwise we won't be able to create the gh-pages
     # branch
     repo.create_file(
-        path="/README.md",
+        path="README.md",
         message="initial",
         content=description,
     )
@@ -268,7 +265,7 @@ def run_create(name, token, systems, org, private):
     for template in tqdm(TEMPLATES, desc="Adding template files"):
         with open(os.path.join(ROOT, "template", template), "r") as f:
             repo.create_file(
-                path="/" + template,
+                path=template,
                 message="initial",
                 content=f.read(),
                 branch="gh-pages"
@@ -320,7 +317,7 @@ def get_config(repo):
     config = DEFAULT_CONFIG
     if "config.json" in files:
         # get the config file, parse JSON and merge it with the default config
-        config_file = repo.get_file_contents('/config.json', ref="gh-pages")
+        config_file = repo.get_file_contents('config.json', ref="gh-pages")
         try:
             repo_config = json.loads(config_file.decoded_content.decode("utf-8"))
             config.update(repo_config)
