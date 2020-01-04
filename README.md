@@ -1,3 +1,5 @@
+*We are currently alpha-testing a fully automated statuspage GitHub app. Check out [corestatus.io](https://corestatus.io/) if you like to test it out.*
+
 # Statuspage
 
 [![Build Status](https://travis-ci.org/jayfk/statuspage.svg?branch=master)](https://travis-ci.org/jayfk/statuspage)
