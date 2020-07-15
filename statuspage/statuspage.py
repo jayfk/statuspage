@@ -143,8 +143,8 @@ def run_upgrade(name, token, org):
         with open(os.path.join(ROOT, "template", template), "r") as f:
             content = f.read()
             if template in files:
-                repo_template = repo.get_file_contents(
-                    path="/" + template,
+                repo_template = repo.get_contents(
+                    path=template,
                     ref=head_sha,
                 )
                 if not is_same_content(
@@ -152,7 +152,7 @@ def run_upgrade(name, token, org):
                     base64.b64decode(repo_template.content)
                 ):
                     repo.update_file(
-                        path="/" + template,
+                        path=template,
                         sha=repo_template.sha,
                         message="upgrade",
                         content=content,
@@ -160,7 +160,7 @@ def run_upgrade(name, token, org):
                     )
             else:
                 repo.create_file(
-                    path="/" + template,
+                    path=template,
                     message="upgrade",
                     content=content,
                     branch="gh-pages"
@@ -176,8 +176,8 @@ def run_update(name, token, org):
     sha = repo.get_git_ref("heads/gh-pages").object.sha
 
     # get the template from the repo
-    template_file = repo.get_file_contents(
-        path="/template.html",
+    template_file = repo.get_contents(
+        path="template.html",
         ref=sha
     )
 
@@ -195,8 +195,8 @@ def run_update(name, token, org):
     # create/update the index.html with the template
     try:
         # get the index.html file, we need the sha to update it
-        index = repo.get_file_contents(
-            path="/index.html",
+        index = repo.get_contents(
+            path="index.html",
             ref=sha,
         )
 
@@ -205,7 +205,7 @@ def run_update(name, token, org):
             return False
 
         repo.update_file(
-            path="/index.html",
+            path="index.html",
             sha=index.sha,
             message="update index",
             content=content,
@@ -214,7 +214,7 @@ def run_update(name, token, org):
     except UnknownObjectException:
         # index.html does not exist, create it
         repo.create_file(
-            path="/index.html",
+            path="index.html",
             message="initial",
             content=content,
             branch="gh-pages",
@@ -317,7 +317,7 @@ def get_config(repo):
     config = DEFAULT_CONFIG
     if "config.json" in files:
         # get the config file, parse JSON and merge it with the default config
-        config_file = repo.get_file_contents('config.json', ref="gh-pages")
+        config_file = repo.get_contents('config.json', ref="gh-pages")
         try:
             repo_config = json.loads(config_file.decoded_content.decode("utf-8"))
             config.update(repo_config)
