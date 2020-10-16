@@ -160,7 +160,7 @@ def run_upgrade(name, token, org):
                     )
             else:
                 repo.create_file(
-                    path="/" + template,
+                    path=template,
                     message="upgrade",
                     content=content,
                     branch="gh-pages"
@@ -214,7 +214,7 @@ def run_update(name, token, org):
     except UnknownObjectException:
         # index.html does not exist, create it
         repo.create_file(
-            path="/index.html",
+            path="index.html",
             message="initial",
             content=content,
             branch="gh-pages",
