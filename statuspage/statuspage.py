@@ -152,7 +152,7 @@ def run_upgrade(name, token, org):
                     base64.b64decode(repo_template.content)
                 ):
                     repo.update_file(
-                        path="/" + template,
+                        path=template,
                         sha=repo_template.sha,
                         message="upgrade",
                         content=content,
@@ -205,7 +205,7 @@ def run_update(name, token, org):
             return False
 
         repo.update_file(
-            path="/index.html",
+            path="index.html",
             sha=index.sha,
             message="update index",
             content=content,
