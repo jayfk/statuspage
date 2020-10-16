@@ -40,9 +40,9 @@ TEMPLATES = [
 
 DEFAULT_CONFIG = {
     "footer": "Status page hosted by GitHub, generated with <a href='https://github.com/jayfk/statuspage'>jayfk/statuspage</a>",
-    "logo": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/logo.png",
+    "logo": "https://raw.githubusercontent.com/jayfk/statuspage/main/template/logo.png",
     "title": "Status",
-    "favicon": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/favicon.png"
+    "favicon": "https://raw.githubusercontent.com/jayfk/statuspage/main/template/favicon.png"
 }
 
 
@@ -249,7 +249,7 @@ def run_create(name, token, systems, org, private):
     for label in tqdm(systems.split(","), desc="Creating system labels"):
         repo.create_label(name=label.strip(), color=SYSTEM_LABEL_COLOR)
 
-    # add an empty file to master, otherwise we won't be able to create the gh-pages
+    # add an empty file to main, otherwise we won't be able to create the gh-pages
     # branch
     repo.create_file(
         path="README.md",
@@ -258,7 +258,7 @@ def run_create(name, token, systems, org, private):
     )
 
     # create the gh-pages branch
-    ref = repo.get_git_ref("heads/master")
+    ref = repo.get_git_ref("heads/main")
     repo.create_git_ref(ref="refs/heads/gh-pages", sha=ref.object.sha)
 
     # add all the template files to the gh-pages branch
