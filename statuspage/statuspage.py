@@ -143,7 +143,7 @@ def run_upgrade(name, token, org):
         with open(os.path.join(ROOT, "template", template), "r") as f:
             content = f.read()
             if template in files:
-                repo_template = repo.get_file_contents(
+                repo_template = repo.get_contents(
                     path="/" + template,
                     ref=head_sha,
                 )
@@ -176,7 +176,7 @@ def run_update(name, token, org):
     sha = repo.get_git_ref("heads/gh-pages").object.sha
 
     # get the template from the repo
-    template_file = repo.get_file_contents(
+    template_file = repo.get_contents(
         path="/template.html",
         ref=sha
     )
@@ -195,7 +195,7 @@ def run_update(name, token, org):
     # create/update the index.html with the template
     try:
         # get the index.html file, we need the sha to update it
-        index = repo.get_file_contents(
+        index = repo.get_contents(
             path="/index.html",
             ref=sha,
         )
@@ -317,7 +317,7 @@ def get_config(repo):
     config = DEFAULT_CONFIG
     if "config.json" in files:
         # get the config file, parse JSON and merge it with the default config
-        config_file = repo.get_file_contents('config.json', ref="gh-pages")
+        config_file = repo.get_contents('config.json', ref="gh-pages")
         try:
             repo_config = json.loads(config_file.decoded_content.decode("utf-8"))
             config.update(repo_config)
