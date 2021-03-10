@@ -305,7 +305,7 @@ def get_files(repo):
     """
     Get a list of all files.
     """
-    return [file.path for file in repo.get_dir_contents("/", ref="gh-pages")]
+    return [file.path for file in repo.get_contents("/", ref="gh-pages")]
 
 
 def get_config(repo):
