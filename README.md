@@ -93,13 +93,21 @@ The generated status page is translated via JavaScript on the client side using 
 Translations are available for the following languages:
 
 - en
+- bg
 - de
+- kr
 - nl
 - pt
 - es
 - ru
 - fr
 - pl
+- zh-HK
+- zh-TW
+- zh-CN
+- it
+- fur
+- vn
 
 Want to add a translation? Open `translations.ini` and add it. Pull requests welcome!
 
