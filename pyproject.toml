@@ -6,7 +6,7 @@ authors = ["Jannis Gebauer <ja.geb@me.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.5"
+python = "^3.7"
 tqdm = "4.15.0"
 pygithub = "1.44.1"
 markdown2 = "2.3.8"
