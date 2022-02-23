@@ -144,7 +144,7 @@ def run_upgrade(name, token, org):
             content = f.read()
             if template in files:
                 repo_template = repo.get_contents(
-                    path="/" + template,
+                    path=template,
                     ref=head_sha,
                 )
                 if not is_same_content(
@@ -177,7 +177,7 @@ def run_update(name, token, org):
 
     # get the template from the repo
     template_file = repo.get_contents(
-        path="/template.html",
+        path="template.html",
         ref=sha
     )
 
@@ -196,7 +196,7 @@ def run_update(name, token, org):
     try:
         # get the index.html file, we need the sha to update it
         index = repo.get_contents(
-            path="/index.html",
+            path="index.html",
             ref=sha,
         )
 

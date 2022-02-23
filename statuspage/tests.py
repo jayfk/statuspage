@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
+import traceback
 from datetime import datetime
 from unittest import TestCase
 from mock import patch, Mock
@@ -50,8 +51,8 @@ class CLITestCase(TestCase):
         self.template = Mock()
         self.template.decoded_content = b"some foo"
         self.template.content = codecs.encode(b"some other foo", "base64")
-        self.gh().get_user().get_repo().get_file_contents.return_value = self.template
-        self.gh().get_organization().get_repo().get_file_contents.return_value = self.template
+        self.gh().get_user().get_repo().get_contents.return_value = self.template
+        self.gh().get_organization().get_repo().get_contents.return_value = self.template
 
         self.collaborator = Mock()
         self.collaborator.login = "some-dude"
