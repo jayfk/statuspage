@@ -263,7 +263,7 @@ def run_create(name, token, systems, org, private):
 
     # add all the template files to the gh-pages branch
     for template in tqdm(TEMPLATES, desc="Adding template files"):
-        with open(os.path.join(ROOT, "template", template), "r") as f:
+        with open(os.path.join(ROOT, "template", template), "r", encoding='utf-8') as f:
             repo.create_file(
                 path=template,
                 message="initial",
