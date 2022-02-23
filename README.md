@@ -2,7 +2,7 @@
 
 # Statuspage
 
-[![Build Status](https://travis-ci.org/jayfk/statuspage.svg?branch=master)](https://travis-ci.org/jayfk/statuspage)
+[![ci](https://github.com/jayfk/statuspage/actions/workflows/ci.yml/badge.svg)](https://github.com/jayfk/statuspage/actions/workflows/ci.yml)
 [![codecov.io](https://codecov.io/github/jayfk/statuspage/coverage.svg?branch=master)](https://codecov.io/github/jayfk/statuspage?branch=master)
 
 A statuspage generator that lets you host your statuspage for free on GitHub. Uses
