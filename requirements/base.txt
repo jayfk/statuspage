@@ -4,4 +4,4 @@ jinja2==2.10.3
 click==7.0
 tqdm==4.15.0
 requests==2.22.0
-markdown2==2.4.3
+markdown2==2.4.4
