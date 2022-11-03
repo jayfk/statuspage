@@ -106,6 +106,7 @@ Translations are available for the following languages:
 - zh-TW
 - zh-CN
 - it
+- id
 - fur
 - vn
 
