@@ -5,3 +5,4 @@ click==7.0
 tqdm==4.15.0
 requests==2.22.0
 markdown2==2.4.3
+pyjwt>=2.4.0 # not directly required, pinned by Snyk to avoid a vulnerability
